@@ -1,77 +1,181 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="DevToolbox: fast, private, zero-dependency browser tools for developers.">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="DevToolbox: fast, private, zero-dependency browser tools for developers." />
   <title>DevToolbox — Developer Utilities</title>
   <style>
-    :root { --bg:#070b14; --panel:#101827; --panel-2:#162235; --surface:#0b1220; --text:#e8f0fc; --muted:#9cafc9; --primary:#7dd3fc; --accent:#a78bfa; --good:#34d399; --danger:#fb7185; --border:rgba(148,163,184,.22); --shadow:0 18px 45px rgba(2,6,23,.42); --radius:18px; }
-    [data-theme="light"] { --bg:#eef4fb; --panel:#fff; --panel-2:#f4f7fb; --surface:#f8fafc; --text:#142033; --muted:#52647c; --primary:#0284c7; --accent:#7c3aed; --border:rgba(71,85,105,.2); --shadow:0 18px 40px rgba(51,65,85,.14); }
-    * { box-sizing:border-box; }
-    html { scroll-behavior:smooth; }
-    body { margin:0; min-height:100vh; font:15px/1.55 Inter,system-ui,-apple-system,"Segoe UI",sans-serif; color:var(--text); background:radial-gradient(circle at 0 0,rgba(56,189,248,.18),transparent 28%),radial-gradient(circle at 100% 0,rgba(167,139,250,.16),transparent 25%),var(--bg); }
-    button,input,textarea { font:inherit; }
-    button { cursor:pointer; }
-    a { color:var(--primary); }
-    .layout { display:flex; min-height:100vh; }
-    .sidebar { position:sticky; top:0; width:260px; height:100vh; padding:22px 16px; border-right:1px solid var(--border); background:rgba(7,11,20,.72); backdrop-filter:blur(14px); z-index:5; }
-    [data-theme="light"] .sidebar { background:rgba(255,255,255,.8); }
-    .brand { display:flex; align-items:center; gap:11px; padding:4px 8px 26px; color:var(--text); text-decoration:none; font-weight:850; font-size:1.08rem; }
-    .brand img { width:42px; height:42px; object-fit:cover; border-radius:13px; box-shadow:0 8px 18px rgba(56,189,248,.22); }
-    .nav-title { padding:0 10px 8px; color:var(--muted); font-size:.72rem; text-transform:uppercase; letter-spacing:.14em; font-weight:800; }
-    .nav { display:grid; gap:4px; }
-    .nav a { padding:10px 11px; border-radius:10px; color:var(--muted); text-decoration:none; transition:.15s; }
-    .nav a:hover,.nav a.active { background:rgba(125,211,252,.12); color:var(--primary); }
-    .side-footer { position:absolute; left:24px; right:20px; bottom:22px; color:var(--muted); font-size:.8rem; }
-    .side-footer a { display:block; margin-top:5px; }
-    .main { width:min(1240px,100%); margin:0 auto; padding:25px 22px 60px; }
-    .topbar { display:flex; justify-content:flex-end; align-items:center; gap:10px; margin-bottom:22px; }
-    .icon-btn,.btn { border:1px solid var(--border); border-radius:11px; padding:9px 12px; background:var(--panel); color:var(--text); font-weight:700; transition:.15s; }
-    .icon-btn:hover,.btn:hover { transform:translateY(-1px); filter:brightness(1.08); }
-    .hero { display:grid; grid-template-columns:1.35fr .65fr; gap:20px; margin-bottom:28px; }
-    .hero-card,.stats { border:1px solid var(--border); border-radius:var(--radius); background:var(--panel); box-shadow:var(--shadow); }
-    .hero-card { padding:32px; }
-    .eyebrow { color:var(--primary); text-transform:uppercase; font-size:.74rem; letter-spacing:.16em; font-weight:850; }
-    h1 { margin:12px 0; font-size:clamp(2.35rem,5vw,4.6rem); line-height:.98; letter-spacing:-.06em; }
-    .hero p { max-width:64ch; margin:0; color:var(--muted); font-size:1.05rem; }
-    .hero-actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:24px; }
-    .btn.primary { border:0; color:#061220; background:linear-gradient(135deg,var(--primary),#38bdf8); }
-    .btn.accent { border:0; color:#fff; background:linear-gradient(135deg,var(--accent),#6366f1); }
-    .stats { display:grid; gap:12px; padding:16px; }
-    .stat { display:flex; justify-content:space-between; align-items:end; padding:15px; border:1px solid var(--border); border-radius:14px; background:var(--panel-2); }
-    .stat strong { font-size:1.8rem; line-height:1; }
-    .stat span { color:var(--muted); }
-    .featured { margin:0 0 24px; }
-    .section-heading { display:flex; justify-content:space-between; align-items:end; gap:12px; margin-bottom:12px; }
-    h2 { margin:0; font-size:1.3rem; }
-    .section-heading p { margin:0; color:var(--muted); }
-    .featured-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
-    .feature { display:block; padding:17px; border:1px solid var(--border); border-radius:15px; background:linear-gradient(135deg,rgba(125,211,252,.12),rgba(167,139,250,.08)); color:var(--text); text-decoration:none; }
-    .feature:hover { border-color:var(--primary); }
-    .feature b { display:block; margin-bottom:4px; }
-    .feature span { color:var(--muted); font-size:.9rem; }
-    .tools { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:18px; }
-    .card { overflow:hidden; border:1px solid var(--border); border-radius:var(--radius); background:var(--panel); box-shadow:var(--shadow); scroll-margin-top:20px; }
-    .card-head { display:flex; justify-content:space-between; align-items:center; gap:8px; padding:14px 16px; border-bottom:1px solid var(--border); background:rgba(148,163,184,.05); font-weight:800; }
-    .tag { padding:5px 9px; border:1px solid rgba(125,211,252,.28); border-radius:999px; color:var(--primary); background:rgba(125,211,252,.1); font-size:.72rem; }
-    .card-body { display:grid; gap:11px; padding:16px; }
-    label { display:block; margin-bottom:5px; color:var(--muted); font-size:.82rem; font-weight:650; }
-    input,textarea { width:100%; padding:11px 12px; border:1px solid var(--border); border-radius:11px; color:var(--text); background:var(--surface); outline:none; resize:vertical; }
-    input:focus,textarea:focus { border-color:var(--primary); box-shadow:0 0 0 3px rgba(56,189,248,.12); }
-    textarea { min-height:105px; }
-    .actions { display:flex; flex-wrap:wrap; gap:8px; }
-    .small { padding:8px 11px; font-size:.88rem; }
-    .result-wrap { position:relative; }
-    .result { min-height:70px; padding:12px 42px 12px 13px; border:1px solid var(--border); border-radius:11px; background:var(--surface); color:var(--text); white-space:pre-wrap; overflow-wrap:anywhere; }
-    .result.error { color:#fecaca; border-color:rgba(251,113,133,.55); }
-    .copy-btn { position:absolute; top:7px; right:7px; padding:5px 7px; border:1px solid var(--border); border-radius:7px; background:var(--panel-2); color:var(--muted); font-size:.72rem; }
-    .copy-btn:hover { color:var(--primary); }
-    .swatch { display:inline-block; width:20px; height:20px; margin-left:7px; vertical-align:middle; border:2px solid rgba(255,255,255,.3); border-radius:50%; }
-    footer { margin-top:34px; padding-top:20px; border-top:1px solid var(--border); color:var(--muted); text-align:center; }
-    footer a { font-weight:700; text-decoration:none; }
-    @media (max-width:900px) { .sidebar { position:static; width:100%; height:auto; border-right:0; border-bottom:1px solid var(--border); } .layout { display:block; } .nav { display:flex; flex-wrap:wrap; } .nav-title,.side-footer { display:none; } .brand { padding-bottom:14px; } .hero { grid-template-columns:1fr; } }
-    @media (max-width:650px) { .main { padding:16px 12px 44px; } .hero-card { padding:24px 20px; } .featured-grid { grid-template-columns:1fr; } .topbar { justify-content:space-between; } }
+    :root {
+      --bg: #070b14;
+      --panel: #101827;
+      --panel-2: #162235;
+      --surface: #0b1220;
+      --text: #e8f0fc;
+      --muted: #9cafc9;
+      --primary: #7dd3fc;
+      --accent: #a78bfa;
+      --good: #34d399;
+      --danger: #fb7185;
+      --border: rgba(148, 163, 184, 0.22);
+      --shadow: 0 18px 45px rgba(2, 6, 23, 0.42);
+      --radius: 18px;
+    }
+    [data-theme="light"] {
+      --bg: #eef4fb;
+      --panel: #ffffff;
+      --panel-2: #f4f7fb;
+      --surface: #f8fafc;
+      --text: #142033;
+      --muted: #52647c;
+      --primary: #0284c7;
+      --accent: #7c3aed;
+      --border: rgba(71, 85, 105, 0.2);
+      --shadow: 0 18px 40px rgba(51, 65, 85, 0.14);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font: 15px/1.55 Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 0 0, rgba(56, 189, 248, 0.18), transparent 28%),
+        radial-gradient(circle at 100% 0, rgba(167, 139, 250, 0.16), transparent 25%),
+        var(--bg);
+    }
+    button, input, textarea, select { font: inherit; }
+    button { cursor: pointer; }
+    a { color: var(--primary); }
+    .layout { display: flex; min-height: 100vh; }
+    .sidebar {
+      position: sticky;
+      top: 0;
+      width: 260px;
+      height: 100vh;
+      padding: 22px 16px;
+      border-right: 1px solid var(--border);
+      background: rgba(7, 11, 20, 0.72);
+      backdrop-filter: blur(14px);
+      z-index: 5;
+    }
+    [data-theme="light"] .sidebar { background: rgba(255, 255, 255, 0.8); }
+    .brand {
+      display: flex; align-items: center; gap: 11px;
+      padding: 4px 8px 26px;
+      color: var(--text); text-decoration: none; font-weight: 850; font-size: 1.08rem;
+    }
+    .brand img {
+      width: 42px; height: 42px; object-fit: cover; border-radius: 13px;
+      box-shadow: 0 8px 18px rgba(56, 189, 248, 0.22);
+    }
+    .nav-title {
+      padding: 0 10px 8px; color: var(--muted); font-size: .72rem; text-transform: uppercase; letter-spacing: .14em; font-weight: 800;
+    }
+    .nav { display: grid; gap: 4px; }
+    .nav a {
+      padding: 10px 11px; border-radius: 10px; color: var(--muted); text-decoration: none; transition: .15s;
+    }
+    .nav a:hover, .nav a.active { background: rgba(125, 211, 252, 0.12); color: var(--primary); }
+    .side-footer {
+      position: absolute; left: 24px; right: 20px; bottom: 22px; color: var(--muted); font-size: .8rem;
+    }
+    .side-footer a { display: block; margin-top: 5px; }
+    .main { width: min(1240px, 100%); margin: 0 auto; padding: 25px 22px 60px; }
+    .topbar {
+      display: flex; justify-content: flex-end; align-items: center; gap: 10px; margin-bottom: 22px;
+    }
+    .icon-btn, .btn {
+      border: 1px solid var(--border); border-radius: 11px; padding: 9px 12px; background: var(--panel); color: var(--text); font-weight: 700; transition: .15s;
+    }
+    .icon-btn:hover, .btn:hover { transform: translateY(-1px); filter: brightness(1.08); }
+    .hero {
+      display: grid; grid-template-columns: 1.35fr .65fr; gap: 20px; margin-bottom: 28px;
+    }
+    .hero-card, .stats { border: 1px solid var(--border); border-radius: var(--radius); background: var(--panel); box-shadow: var(--shadow); }
+    .hero-card { padding: 32px; }
+    .eyebrow { color: var(--primary); text-transform: uppercase; font-size: .74rem; letter-spacing: .16em; font-weight: 850; }
+    h1 {
+      margin: 12px 0; font-size: clamp(2.35rem, 5vw, 4.6rem); line-height: .98; letter-spacing: -.06em;
+    }
+    .hero p { max-width: 64ch; margin: 0; color: var(--muted); font-size: 1.05rem; }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+    .btn.primary { border: 0; color: #061220; background: linear-gradient(135deg, var(--primary), #38bdf8); }
+    .btn.accent { border: 0; color: #fff; background: linear-gradient(135deg, var(--accent), #6366f1); }
+    .stats { display: grid; gap: 12px; padding: 16px; }
+    .stat { display: flex; justify-content: space-between; align-items: end; padding: 15px; border: 1px solid var(--border); border-radius: 14px; background: var(--panel-2); }
+    .stat strong { font-size: 1.8rem; line-height: 1; }
+    .stat span { color: var(--muted); }
+    .featured { margin: 0 0 24px; }
+    .section-heading { display: flex; justify-content: space-between; align-items: end; gap: 12px; margin-bottom: 12px; }
+    h2 { margin: 0; font-size: 1.3rem; }
+    .section-heading p { margin: 0; color: var(--muted); }
+    .featured-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .feature {
+      display: block; padding: 17px; border: 1px solid var(--border); border-radius: 15px; background: linear-gradient(135deg, rgba(125, 211, 252, 0.12), rgba(167, 139, 250, 0.08)); color: var(--text); text-decoration: none;
+    }
+    .feature:hover { border-color: var(--primary); }
+    .feature b { display: block; margin-bottom: 4px; }
+    .feature span { color: var(--muted); font-size: .9rem; }
+    .tools { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; }
+    .card {
+      overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius); background: var(--panel); box-shadow: var(--shadow); scroll-margin-top: 20px;
+    }
+    .card-head {
+      display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 14px 16px; border-bottom: 1px solid var(--border); background: rgba(148,163,184,.05); font-weight: 800;
+    }
+    .tag { padding: 5px 9px; border: 1px solid rgba(125, 211, 252, 0.28); border-radius: 999px; color: var(--primary); background: rgba(125, 211, 252, 0.1); font-size: .72rem; }
+    .card-body { display: grid; gap: 11px; padding: 16px; }
+    label { display: block; margin-bottom: 5px; color: var(--muted); font-size: .82rem; font-weight: 650; }
+    input, textarea, select {
+      width: 100%; padding: 11px 12px; border: 1px solid var(--border); border-radius: 11px; color: var(--text); background: var(--surface); outline: none; resize: vertical;
+    }
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--primary); box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.12);
+    }
+    textarea { min-height: 105px; }
+    .actions { display: flex; flex-wrap: wrap; gap: 8px; }
+    .small { padding: 8px 11px; font-size: .88rem; }
+    .result-wrap { position: relative; }
+    .result {
+      min-height: 70px; padding: 12px 42px 12px 13px; border: 1px solid var(--border); border-radius: 11px; background: var(--surface); color: var(--text); white-space: pre-wrap; overflow-wrap: anywhere;
+    }
+    .result.error { color: #fecaca; border-color: rgba(251,113,133,.55); }
+    .copy-btn {
+      position: absolute; top: 7px; right: 7px; padding: 5px 7px; border: 1px solid var(--border); border-radius: 7px; background: var(--panel-2); color: var(--muted); font-size: .72rem;
+    }
+    .copy-btn:hover { color: var(--primary); }
+    .swatch { display: inline-block; width: 20px; height: 20px; margin-left: 7px; vertical-align: middle; border: 2px solid rgba(255,255,255,.3); border-radius: 50%; }
+    .file-drop {
+      border: 1.5px dashed var(--border); border-radius: 12px; padding: 18px 14px; text-align: center; color: var(--muted); background: rgba(148,163,184,.04); cursor: pointer;
+    }
+    .file-drop.dragover { border-color: var(--primary); background: rgba(125, 211, 252, 0.07); }
+    .meta-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+    .meta-item {
+      background: rgba(148, 163, 184, 0.04); border: 1px solid var(--border); border-radius: 10px; padding: 8px 10px; min-height: 60px;
+    }
+    .meta-item small { display: block; color: var(--muted); margin-bottom: 5px; }
+    .meta-item strong { word-break: break-word; }
+    footer {
+      margin-top: 34px; padding-top: 20px; border-top: 1px solid var(--border); color: var(--muted); text-align: center;
+    }
+    footer a { font-weight: 700; text-decoration: none; }
+    @media (max-width:900px) {
+      .sidebar { position: static; width: 100%; height: auto; border-right: 0; border-bottom: 1px solid var(--border); }
+      .layout { display: block; }
+      .nav { display: flex; flex-wrap: wrap; }
+      .nav-title, .side-footer { display: none; }
+      .brand { padding-bottom: 14px; }
+      .hero { grid-template-columns: 1fr; }
+    }
+    @media (max-width:650px) {
+      .main { padding: 16px 12px 44px; }
+      .hero-card { padding: 24px 20px; }
+      .featured-grid { grid-template-columns: 1fr; }
+      .topbar { justify-content: space-between; }
+      .meta-grid { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
@@ -80,55 +184,604 @@
       <a class="brand" href="#top"><img src="https://i.postimg.cc/Xq8WBPS0/Picsart-26-09-19-15-25-56-276.png" alt="Digital Ghost logo"><span>DevToolbox</span></a>
       <div class="nav-title">Quick navigation</div>
       <nav class="nav" aria-label="Tool navigation">
-        <a class="active" href="#top">Overview</a><a href="#featured">Featured tools</a><a href="#json">JSON</a><a href="#encoding">Encoding</a><a href="#crypto">Crypto</a><a href="#text">Text tools</a><a href="#time">Time & color</a>
+        <a class="active" href="#top">Overview</a>
+        <a href="#featured">Featured</a>
+        <a href="#file-inspector">File inspector</a>
+        <a href="#cipher-tools">Ciphers</a>
+        <a href="#crypto">Crypto</a>
+        <a href="#text">Text tools</a>
+        <a href="#time">Time & logic</a>
       </nav>
       <div class="side-footer">Built by <a href="https://www.digitalghost.blog" target="_blank" rel="noopener">Digital Ghost</a></div>
     </aside>
 
     <main class="main" id="top">
-      <div class="topbar"><span class="tag">Private · Fast · No build step</span><button class="icon-btn" id="themeToggle" type="button" aria-label="Toggle theme">☀️ Light mode</button></div>
+      <div class="topbar">
+        <span class="tag">Private · Fast · No build step</span>
+        <button class="icon-btn" id="themeToggle" type="button" aria-label="Toggle theme">☀️ Light mode</button>
+      </div>
+
       <section class="hero">
-        <div class="hero-card"><div class="eyebrow">Developer utilities</div><h1>Everything tiny.<br><span style="color:var(--primary)">Nothing extra.</span></h1><p>Useful browser tools for everyday development work. Your data stays in the browser, and the whole toolkit runs from one zero-dependency HTML file.</p><div class="hero-actions"><button class="btn primary" onclick="document.getElementById('featured').scrollIntoView({behavior:'smooth'})">Explore tools</button><button class="btn accent" onclick="generateUuid()">Generate UUID</button></div></div>
-        <aside class="stats"><div class="stat"><strong>12</strong><span>tools included</span></div><div class="stat"><strong>0</strong><span>dependencies</span></div><div class="stat"><strong>100%</strong><span>browser-based</span></div></aside>
+        <div class="hero-card">
+          <div class="eyebrow">Developer utilities</div>
+          <h1>Everything tiny.<br><span style="color:var(--primary)">Nothing extra.</span></h1>
+          <p>
+            DevToolbox is a lightweight browser toolkit for coding, debugging, and lightweight security work. It runs in a single HTML file, works offline, and keeps your data in the browser.
+          </p>
+          <div class="hero-actions">
+            <button class="btn primary" onclick="document.getElementById('featured').scrollIntoView({behavior:'smooth'})">Explore tools</button>
+            <button class="btn accent" onclick="generateUuid()">Generate UUID</button>
+          </div>
+        </div>
+        <aside class="stats">
+          <div class="stat"><strong>15+</strong><span>tools included</span></div>
+          <div class="stat"><strong>0</strong><span>dependencies</span></div>
+          <div class="stat"><strong>100%</strong><span>browser-based</span></div>
+        </aside>
       </section>
 
-      <section class="featured" id="featured"><div class="section-heading"><div><h2>Featured tools</h2><p>Jump straight to the tools you use most.</p></div></div><div class="featured-grid"><a class="feature" href="#json"><b>JSON formatter</b><span>Make structured data readable or compact.</span></a><a class="feature" href="#crypto"><b>SHA-256 hash</b><span>Create a cryptographic digest locally.</span></a><a class="feature" href="#text"><b>Live regex tester</b><span>Test patterns and inspect capture groups.</span></a></div></section>
+      <section class="featured" id="featured">
+        <div class="section-heading">
+          <div>
+            <h2>Featured tools</h2>
+            <p>Jump straight to the tools you use most.</p>
+          </div>
+        </div>
+        <div class="featured-grid">
+          <a class="feature" href="#file-inspector"><b>File Inspector</b><span>Identify file types, check CRC32, and inflate gzip/zlib data.</span></a>
+          <a class="feature" href="#cipher-tools"><b>Classical Ciphers</b><span>Encode and decode Vigenère, Atbash, Affine, Rail Fence, Bacon, and Morse.</span></a>
+          <a class="feature" href="#crypto"><b>SHA-256 + UUID</b><span>Hash, generate IDs, and inspect data in seconds.</span></a>
+        </div>
+      </section>
 
       <main class="tools">
-        <section class="card" id="json"><div class="card-head"><span>JSON Formatter / Minifier</span><span class="tag">JSON</span></div><div class="card-body"><div><label for="jsonInput">Input</label><textarea id="jsonInput" placeholder='{"hello":"world","items":[1,2,3]}'></textarea></div><div class="actions"><button class="btn primary small" onclick="formatJson()">Format</button><button class="btn small" onclick="minifyJson()">Minify</button></div><div class="result-wrap"><div id="jsonOutput" class="result"></div><button class="copy-btn" onclick="copyResult('jsonOutput',this)">Copy</button></div></div></section>
-        <section class="card" id="encoding"><div class="card-head"><span>Base64</span><span class="tag">Encode</span></div><div class="card-body"><div><label for="base64Input">Input</label><textarea id="base64Input" placeholder="Type text to encode or decode"></textarea></div><div class="actions"><button class="btn primary small" onclick="base64Encode()">Encode</button><button class="btn small" onclick="base64Decode()">Decode</button></div><div class="result-wrap"><div id="base64Output" class="result"></div><button class="copy-btn" onclick="copyResult('base64Output',this)">Copy</button></div></div></section>
-        <section class="card"><div class="card-head"><span>URL Encoder / Decoder</span><span class="tag">URL</span></div><div class="card-body"><div><label for="urlInput">Input</label><textarea id="urlInput" placeholder="https://example.com/?q=hello world"></textarea></div><div class="actions"><button class="btn primary small" onclick="urlEncode()">Encode</button><button class="btn small" onclick="urlDecode()">Decode</button></div><div class="result-wrap"><div id="urlOutput" class="result"></div><button class="copy-btn" onclick="copyResult('urlOutput',this)">Copy</button></div></div></section>
-        <section class="card" id="crypto"><div class="card-head"><span>SHA-256 Hash</span><span class="tag">Crypto</span></div><div class="card-body"><div><label for="hashInput">Text</label><textarea id="hashInput" placeholder="Enter text to hash"></textarea></div><div class="actions"><button class="btn primary small" onclick="hashSha256()">Generate hash</button></div><div class="result-wrap"><div id="hashOutput" class="result"></div><button class="copy-btn" onclick="copyResult('hashOutput',this)">Copy</button></div></div></section>
-        <section class="card"><div class="card-head"><span>UUID v4 Generator</span><span class="tag">ID</span></div><div class="card-body"><div class="actions"><button class="btn accent small" onclick="generateUuid()">Generate UUID</button></div><div class="result-wrap"><div id="uuidOutput" class="result"></div><button class="copy-btn" onclick="copyResult('uuidOutput',this)">Copy</button></div></div></section>
-        <section class="card" id="time"><div class="card-head"><span>Color Converter</span><span class="tag">HEX · RGB · HSL</span></div><div class="card-body"><div><label for="colorInput">Color</label><input id="colorInput" value="#38bdf8" placeholder="#38bdf8 or rgb(56, 189, 248)"></div><div class="actions"><button class="btn primary small" onclick="convertColor()">Convert</button></div><div class="result-wrap"><div id="colorOutput" class="result"></div><button class="copy-btn" onclick="copyResult('colorOutput',this)">Copy</button></div></div></section>
-        <section class="card"><div class="card-head"><span>Unix Timestamp</span><span class="tag">Time</span></div><div class="card-body"><div><label for="timestampInput">Timestamp or date</label><input id="timestampInput" value="1712345678" placeholder="1712345678 or 2024-04-06T18:41:18Z"></div><div class="actions"><button class="btn primary small" onclick="convertTimestamp()">Convert</button></div><div class="result-wrap"><div id="timestampOutput" class="result"></div><button class="copy-btn" onclick="copyResult('timestampOutput',this)">Copy</button></div></div></section>
-        <section class="card" id="text"><div class="card-head"><span>Live Regex Tester</span><span class="tag">Pattern</span></div><div class="card-body"><div><label for="regexPattern">Pattern</label><input id="regexPattern" value="\\b\\w{4}\\b"></div><div><label for="regexFlags">Flags</label><input id="regexFlags" value="g"></div><div><label for="regexText">Test string</label><textarea id="regexText">alpha beta gamma delta</textarea></div><div class="actions"><button class="btn primary small" onclick="testRegex()">Test regex</button></div><div class="result-wrap"><div id="regexOutput" class="result"></div><button class="copy-btn" onclick="copyResult('regexOutput',this)">Copy</button></div></div></section>
-        <section class="card"><div class="card-head"><span>Case Converter</span><span class="tag">Text</span></div><div class="card-body"><div><label for="caseInput">Text</label><textarea id="caseInput" placeholder="Type text to convert"></textarea></div><div class="actions"><button class="btn primary small" onclick="caseConvert('upper')">UPPER</button><button class="btn small" onclick="caseConvert('lower')">lower</button><button class="btn small" onclick="caseConvert('title')">Title</button><button class="btn small" onclick="caseConvert('sentence')">Sentence</button></div><div class="result-wrap"><div id="caseOutput" class="result"></div><button class="copy-btn" onclick="copyResult('caseOutput',this)">Copy</button></div></div></section>
-        <section class="card"><div class="card-head"><span>Text Statistics</span><span class="tag">Metrics</span></div><div class="card-body"><div><label for="statsInput">Text</label><textarea id="statsInput" placeholder="Paste text to analyze"></textarea></div><div class="actions"><button class="btn primary small" onclick="countStats()">Analyze</button></div><div class="result-wrap"><div id="statsOutput" class="result"></div><button class="copy-btn" onclick="copyResult('statsOutput',this)">Copy</button></div></div></section>
+        <section class="card" id="file-inspector">
+          <div class="card-head"><span>File Inspector</span><span class="tag">Magic bytes</span></div>
+          <div class="card-body">
+            <div id="fileDrop" class="file-drop">Drop a file here or click to choose one</div>
+            <input id="fileInput" type="file" style="display:none;" />
+            <div class="meta-grid">
+              <div class="meta-item"><small>File name</small><strong id="fileName">—</strong></div>
+              <div class="meta-item"><small>Size</small><strong id="fileSize">—</strong></div>
+              <div class="meta-item"><small>Detected type</small><strong id="fileType">—</strong></div>
+              <div class="meta-item"><small>CRC32</small><strong id="fileCrc">—</strong></div>
+            </div>
+            <div class="actions">
+              <button class="btn primary small" onclick="readSelectedFile()">Inspect</button>
+              <button class="btn small" onclick="inflateFileData()">Inflate gzip/zlib</button>
+            </div>
+            <div class="result-wrap">
+              <div id="fileOutput" class="result">Upload a file to inspect its type, checksum, and output.</div>
+              <button class="copy-btn" onclick="copyResult('fileOutput', this)">Copy</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="card" id="cipher-tools">
+          <div class="card-head"><span>Classical Ciphers</span><span class="tag">Encode / decode</span></div>
+          <div class="card-body">
+            <div>
+              <label for="cipherText">Plain text</label>
+              <textarea id="cipherText" placeholder="Type text to encode or decode"></textarea>
+            </div>
+            <div>
+              <label for="cipherKey">Key</label>
+              <input id="cipherKey" type="text" value="devtoolbox" />
+            </div>
+            <div class="actions">
+              <button class="btn primary small" onclick="runCipher('vigenere','enc')">Vigenère encode</button>
+              <button class="btn small" onclick="runCipher('vigenere','dec')">Decode</button>
+              <button class="btn primary small" onclick="runCipher('atbash','enc')">Atbash</button>
+              <button class="btn small" onclick="runCipher('affine','enc')">Affine encode</button>
+              <button class="btn small" onclick="runCipher('affine','dec')">Affine decode</button>
+              <button class="btn primary small" onclick="runCipher('rail','enc')">Rail Fence</button>
+              <button class="btn small" onclick="runCipher('rail','dec')">Rail decode</button>
+              <button class="btn primary small" onclick="runCipher('morse','enc')">Morse</button>
+              <button class="btn small" onclick="runCipher('bacon','enc')">Bacon</button>
+            </div>
+            <div class="result-wrap">
+              <div id="cipherOutput" class="result">Cipher output appears here.</div>
+              <button class="copy-btn" onclick="copyResult('cipherOutput', this)">Copy</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="card" id="crypto">
+          <div class="card-head"><span>Crypto + Identity</span><span class="tag">Hash / UUID</span></div>
+          <div class="card-body">
+            <div>
+              <label for="hashInput">Text</label>
+              <textarea id="hashInput" placeholder="Enter text to hash"></textarea>
+            </div>
+            <div class="actions">
+              <button class="btn primary small" onclick="hashSha256()">SHA-256</button>
+              <button class="btn accent small" onclick="generateUuid()">Generate UUID v4</button>
+            </div>
+            <div class="result-wrap"><div id="hashOutput" class="result"></div><button class="copy-btn" onclick="copyResult('hashOutput', this)">Copy</button></div>
+          </div>
+        </section>
+
+        <section class="card" id="time">
+          <div class="card-head"><span>Timestamp + CRC32</span><span class="tag">Convert</span></div>
+          <div class="card-body">
+            <div>
+              <label for="timestampInput">Timestamp or date</label>
+              <input id="timestampInput" value="1712345678" placeholder="1712345678 or 2024-04-06T18:41:18Z" />
+            </div>
+            <div class="actions">
+              <button class="btn primary small" onclick="convertTimestamp()">Convert</button>
+              <button class="btn small" onclick="crc32Demo()">CRC32 demo</button>
+            </div>
+            <div class="result-wrap"><div id="timestampOutput" class="result"></div><button class="copy-btn" onclick="copyResult('timestampOutput', this)">Copy</button></div>
+          </div>
+        </section>
+
+        <section class="card" id="text">
+          <div class="card-head"><span>Text Tools</span><span class="tag">Regex + stats</span></div>
+          <div class="card-body">
+            <div>
+              <label for="regexPattern">Pattern</label>
+              <input id="regexPattern" value="\\b\\w{4}\\b" />
+            </div>
+            <div>
+              <label for="regexFlags">Flags</label>
+              <input id="regexFlags" value="g" />
+            </div>
+            <div>
+              <label for="regexText">Test string</label>
+              <textarea id="regexText">alpha beta gamma delta</textarea>
+            </div>
+            <div class="actions">
+              <button class="btn primary small" onclick="testRegex()">Test regex</button>
+              <button class="btn small" onclick="countStats()">Text stats</button>
+            </div>
+            <div class="result-wrap"><div id="regexOutput" class="result"></div><button class="copy-btn" onclick="copyResult('regexOutput', this)">Copy</button></div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-head"><span>Number Base Converter</span><span class="tag">Base</span></div>
+          <div class="card-body">
+            <div>
+              <label for="numberValue">Number</label>
+              <input id="numberValue" value="255" />
+            </div>
+            <div>
+              <label for="numberBase">Convert from base</label>
+              <select id="numberBase">
+                <option value="10">10</option>
+                <option value="2">2</option>
+                <option value="8">8</option>
+                <option value="16">16</option>
+              </select>
+            </div>
+            <div class="actions">
+              <button class="btn primary small" onclick="convertNumberBase()">Convert</button>
+            </div>
+            <div class="result-wrap"><div id="numberOutput" class="result"></div><button class="copy-btn" onclick="copyResult('numberOutput', this)">Copy</button></div>
+          </div>
+        </section>
       </main>
+
       <footer>DevToolbox is made with care by <a href="https://www.digitalghost.blog" target="_blank" rel="noopener">Digital Ghost</a> · MIT License</footer>
     </main>
   </div>
+
   <script>
-    const $ = id => document.getElementById(id);
-    function output(id,text,error=false){ $(id).textContent=text; $(id).classList.toggle('error',error); }
-    function copyResult(id,button){ navigator.clipboard?.writeText($(id).textContent).then(()=>{ const old=button.textContent; button.textContent='Copied!'; setTimeout(()=>button.textContent=old,1000); }); }
-    function formatJson(){try{const r=JSON.stringify(JSON.parse($('jsonInput').value),null,2);output('jsonOutput',r);}catch(e){output('jsonOutput','Invalid JSON: '+e.message,true);}}
-    function minifyJson(){try{output('jsonOutput',JSON.stringify(JSON.parse($('jsonInput').value)));}catch(e){output('jsonOutput','Invalid JSON: '+e.message,true);}}
-    function base64Encode(){try{output('base64Output',btoa(unescape(encodeURIComponent($('base64Input').value))));}catch(e){output('base64Output','Encoding failed: '+e.message,true);}}
-    function base64Decode(){try{output('base64Output',decodeURIComponent(escape(atob($('base64Input').value))));}catch(e){output('base64Output','Decoding failed: '+e.message,true);}}
-    function urlEncode(){output('urlOutput',encodeURIComponent($('urlInput').value));}
-    function urlDecode(){try{output('urlOutput',decodeURIComponent($('urlInput').value));}catch(e){output('urlOutput','URL decode failed: '+e.message,true);}}
-    async function hashSha256(){try{const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode($('hashInput').value));output('hashOutput',Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join(''));}catch(e){output('hashOutput','SHA-256 failed: '+e.message,true);}}
-    function generateUuid(){const r=crypto.randomUUID?crypto.randomUUID():'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const n=Math.random()*16|0;return(c==='x'?n:n&3|8).toString(16);});output('uuidOutput',r);}
-    function parseColor(v){v=v.trim();if(v[0]==='#'){let h=v.slice(1);if(h.length===3)h=h.split('').map(x=>x+x).join('');if(!/^[\da-f]{6}$/i.test(h))throw Error('Use #RGB or #RRGGBB');return{r:parseInt(h.slice(0,2),16),g:parseInt(h.slice(2,4),16),b:parseInt(h.slice(4),16)};}let m=v.match(/^rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)$/i);if(m)return{r:+m[1],g:+m[2],b:+m[3]};throw Error('Use HEX or rgb(r, g, b)');}
-    function convertColor(){try{const{r,g,b}=parseColor($('colorInput').value),h='#'+[r,g,b].map(x=>x.toString(16).padStart(2,'0')).join('').toUpperCase(),mx=Math.max(r,g,b)/255,mn=Math.min(r,g,b)/255,l=(mx+mn)/2;output('colorOutput',`HEX: ${h}\nRGB: rgb(${r}, ${g}, ${b})\nLightness: ${Math.round(l*100)}%`);}catch(e){output('colorOutput',e.message,true);}}
-    function convertTimestamp(){try{const v=$('timestampInput').value.trim(),n=Number(v),t=Number.isNaN(n)?new Date(v):new Date(n*1000);if(Number.isNaN(t.getTime()))throw Error('Invalid timestamp or date');output('timestampOutput',`Unix timestamp: ${Math.floor(t.getTime()/1000)}\nLocal: ${t}\nISO: ${t.toISOString()}`);}catch(e){output('timestampOutput',e.message,true);}}
-    function testRegex(){try{const p=$('regexPattern').value,f=$('regexFlags').value,text=$('regexText').value,m=[...text.matchAll(new RegExp(p,f))];output('regexOutput',m.length?m.map((x,i)=>`Match ${i+1}: ${JSON.stringify(x[0])}`).join('\n'):`No matches found for /${p}/${f}`);}catch(e){output('regexOutput','Regex error: '+e.message,true);}}
-    function caseConvert(mode){let v=$('caseInput').value,r=v;if(mode==='upper')r=v.toUpperCase();if(mode==='lower')r=v.toLowerCase();if(mode==='title')r=v.toLowerCase().replace(/\b\w/g,x=>x.toUpperCase());if(mode==='sentence')r=v.toLowerCase().replace(/(^\s*\w|[.!?]\s+\w)/g,x=>x.toUpperCase());output('caseOutput',r);}
-    function countStats(){const v=$('statsInput').value;output('statsOutput',`Characters: ${v.length}\nWords: ${v.trim()?v.trim().split(/\s+/).length:0}\nLines: ${v?v.split(/\r?\n/).length:0}`);}
-    $('themeToggle').onclick=()=>{const light=document.documentElement.dataset.theme==='light';document.documentElement.dataset.theme=light?'dark':'light';$('themeToggle').textContent=light?'☀️ Light mode':'🌙 Dark mode';};
-    formatJson();base64Encode();urlEncode();hashSha256();generateUuid();convertColor();convertTimestamp();testRegex();countStats();
+    const $ = (id) => document.getElementById(id);
+    const out = (id, text, error = false) => {
+      const el = $(id);
+      el.textContent = text;
+      el.classList.toggle('error', error);
+    };
+    function copyResult(id, btn) {
+      const text = $(id).textContent;
+      navigator.clipboard?.writeText(text).then(() => {
+        const old = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => { btn.textContent = old; }, 1000);
+      }).catch(() => {});
+    }
+
+    function setupTheme() {
+      const toggle = $('themeToggle');
+      toggle.addEventListener('click', () => {
+        const light = document.documentElement.dataset.theme === 'light';
+        document.documentElement.dataset.theme = light ? 'dark' : 'light';
+        toggle.textContent = light ? '☀️ Light mode' : '🌙 Dark mode';
+      });
+    }
+
+    function detectMagicType(bytes) {
+      const hex = Array.from(bytes.slice(0, 16)).map(b => b.toString(16).padStart(2, '0')).join('');
+      const sigs = [
+        { test: bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4E && bytes[3] === 0x47, type: 'PNG' },
+        { test: bytes[0] === 0xFF && bytes[1] === 0xD8 && bytes[2] === 0xFF, type: 'JPEG' },
+        { test: bytes[0] === 0x47 && bytes[1] === 0x49 && bytes[2] === 0x46, type: 'GIF' },
+        { test: bytes[0] === 0x25 && bytes[1] === 0x50 && bytes[2] === 0x44 && bytes[3] === 0x46, type: 'PDF' },
+        { test: bytes[0] === 0x50 && bytes[1] === 0x4B && (bytes[2] === 0x03 || bytes[2] === 0x05 || bytes[2] === 0x07), type: 'ZIP/PK' },
+        { test: bytes[0] === 0x1F && bytes[1] === 0x8B, type: 'GZIP' },
+        { test: bytes[0] === 0x52 && bytes[1] === 0x49 && bytes[2] === 0x46 && bytes[3] === 0x46 && bytes[8] === 0x57 && bytes[9] === 0x45 && bytes[10] === 0x42 && bytes[11] === 0x50, type: 'WEBP' },
+        { test: bytes[0] === 0x42 && bytes[1] === 0x4D, type: 'BMP' },
+        { test: bytes[0] === 0x52 && bytes[1] === 0x49 && bytes[2] === 0x46 && bytes[3] === 0x46 && bytes[8] === 0x57 && bytes[9] === 0x41 && bytes[10] === 0x56 && bytes[11] === 0x45, type: 'WAV' },
+        { test: bytes[0] === 0x49 && bytes[1] === 0x44 && bytes[2] === 0x33, type: 'MP3/ID3' },
+        { test: bytes[0] === 0x7F && bytes[1] === 0x45 && bytes[2] === 0x4C && bytes[3] === 0x46, type: 'ELF' },
+        { test: bytes[0] === 0x4D && bytes[1] === 0x5A, type: 'PE/EXE' },
+        { test: bytes[0] === 0x53 && bytes[1] === 0x51 && bytes[2] === 0x4C && bytes[3] === 0x69 && bytes[4] === 0x74, type: 'SQLite' },
+        { test: bytes[0] === 0x50 && bytes[1] === 0x4F && bytes[2] === 0x53 && bytes[3] === 0x58, type: 'PS/POSTSCRIPT' },
+        { test: bytes[0] === 0xD0 && bytes[1] === 0xCF && bytes[2] === 0x11 && bytes[3] === 0xE0, type: 'OLE/MS Office' },
+        { test: bytes[0] === 0x78 && (bytes[1] === 0x01 || bytes[1] === 0x9C || bytes[1] === 0xDA), type: 'zlib' }
+      ];
+      const match = sigs.find((s) => s.test);
+      return match ? match.type : (hex ? `Unknown (0x${hex})` : 'Unknown');
+    }
+
+    function crc32(str) {
+      let crc = 0xFFFFFFFF;
+      for (let i = 0; i < str.length; i++) {
+        crc ^= str.charCodeAt(i);
+        for (let j = 0; j < 8; j++) {
+          crc = (crc >>> 1) ^ (0xEDB88320 & -(crc & 1));
+        }
+      }
+      return (crc ^ 0xFFFFFFFF) >>> 0;
+    }
+
+    function crc32Bytes(bytes) {
+      let crc = 0xFFFFFFFF;
+      for (let i = 0; i < bytes.length; i++) {
+        crc ^= bytes[i];
+        for (let j = 0; j < 8; j++) {
+          crc = (crc >>> 1) ^ (0xEDB88320 & -(crc & 1));
+        }
+      }
+      return (crc ^ 0xFFFFFFFF) >>> 0;
+    }
+
+    function formatHex(bytes, limit = 32) {
+      const slice = bytes.slice(0, limit);
+      return Array.from(slice).map((b) => b.toString(16).padStart(2, '0')).join(' ');
+    }
+
+    async function readSelectedFile() {
+      const input = $('fileInput');
+      if (!input.files || !input.files[0]) {
+        out('fileOutput', 'No file selected.', true);
+        return;
+      }
+      const file = input.files[0];
+      const bytes = new Uint8Array(await file.arrayBuffer());
+      const type = detectMagicType(bytes);
+      const crc = crc32Bytes(bytes).toString(16).padStart(8, '0').toUpperCase();
+      $('fileName').textContent = file.name;
+      $('fileSize').textContent = `${(file.size / 1024).toFixed(2)} KB`;
+      $('fileType').textContent = type;
+      $('fileCrc').textContent = `0x${crc}`;
+
+      out('fileOutput', `Type: ${type}\nCRC32: 0x${crc}\nMagic preview: ${formatHex(bytes, 32)}`);
+    }
+
+    async function inflateFileData() {
+      const input = $('fileInput');
+      if (!input.files || !input.files[0]) {
+        out('fileOutput', 'Please choose a file first.', true);
+        return;
+      }
+      const file = input.files[0];
+      const bytes = new Uint8Array(await file.arrayBuffer());
+      const stream = typeof DecompressionStream !== 'undefined' ? (
+        bytes[0] === 0x1F && bytes[1] === 0x8B ? new DecompressionStream('gzip') : new DecompressionStream('deflate-raw')
+      ) : null;
+      if (!stream) {
+        out('fileOutput', 'This browser does not support DecompressionStream. Use a modern browser.', true);
+        return;
+      }
+      try {
+        const output = await new Response(new Blob([bytes]).stream().pipeThrough(stream)).arrayBuffer();
+        const view = new Uint8Array(output);
+        const txt = Array.from(view).slice(0, 128).map((b) => String.fromCharCode(b)).join('');
+        out('fileOutput', `Inflated output preview (${output.byteLength} bytes)\n${txt.replace(/\s+/g, ' ').slice(0, 220)}`);
+      } catch (err) {
+        out('fileOutput', 'Inflate failed: ' + err.message, true);
+      }
+    }
+
+    const fileDrop = $('fileDrop');
+    const fileInput = $('fileInput');
+    fileDrop.addEventListener('click', () => fileInput.click());
+    ['dragenter', 'dragover'].forEach((event) => {
+      fileDrop.addEventListener(event, (e) => {
+        e.preventDefault();
+        fileDrop.classList.add('dragover');
+      });
+    });
+    ['dragleave', 'drop'].forEach((event) => {
+      fileDrop.addEventListener(event, (e) => {
+        e.preventDefault();
+        fileDrop.classList.remove('dragover');
+      });
+    });
+    fileDrop.addEventListener('drop', (e) => {
+      const files = e.dataTransfer.files;
+      if (files && files[0]) {
+        fileInput.files = files;
+        readSelectedFile();
+      }
+    });
+    fileInput.addEventListener('change', readSelectedFile);
+
+    function runCipher(type, action) {
+      const text = $('cipherText').value;
+      const key = $('cipherKey').value || 'devtoolbox';
+      let result = '';
+
+      if (type === 'vigenere') {
+        result = vigenere(text, key, action === 'enc');
+      } else if (type === 'atbash') {
+        result = atbash(text);
+      } else if (type === 'affine') {
+        result = affine(text, action === 'enc' ? 5 : 5, action === 'enc' ? 8 : 8, action === 'enc');
+      } else if (type === 'rail') {
+        result = railFence(text, 3, action === 'enc');
+      } else if (type === 'morse') {
+        result = morse(text, 'enc');
+      } else if (type === 'bacon') {
+        result = bacon(text, 'enc');
+      }
+      out('cipherOutput', result || 'No output');
+    }
+
+    function normalizeLetter(ch) {
+      return ch.toUpperCase();
+    }
+
+    function vigenere(input, key, encode) {
+      const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+      let out = '';
+      let j = 0;
+      for (let i = 0; i < input.length; i++) {
+        const ch = input[i];
+        const code = ch.charCodeAt(0);
+        if ((code >= 65 && code <= 90) || (code >= 97 && code <= 122)) {
+          const isUpper = code >= 65 && code <= 90;
+          const base = isUpper ? 65 : 97;
+          const k = alphabet.indexOf(normalizeLetter(key[j % key.length]));
+          const p = ((code - base) + (encode ? k : -k + 26)) % 26;
+          out += String.fromCharCode(base + p);
+          j++;
+        } else {
+          out += ch;
+        }
+      }
+      return out;
+    }
+
+    function atbash(text) {
+      const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+      const mapping = {};
+      for (let i = 0; i < alphabet.length; i++) mapping[alphabet[i]] = alphabet[alphabet.length - 1 - i];
+      return text.split('').map((ch) => {
+        const u = ch.toUpperCase();
+        const mapped = /[A-Z]/.test(u) ? mapping[u] : ch;
+        return /[a-z]/.test(ch) ? mapped.toLowerCase() : mapped;
+      }).join('');
+    }
+
+    function affine(text, a, b, encode) {
+      const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+      const mod = alphabet.length;
+      let result = '';
+      const inv = modInverse(a, mod);
+      for (const ch of text) {
+        const code = ch.charCodeAt(0);
+        if (code >= 65 && code <= 90) {
+          const idx = code - 65;
+          const transformed = encode ? (a * idx + b) % mod : (inv * (idx - b + mod)) % mod;
+          result += alphabet[transformed];
+        } else if (code >= 97 && code <= 122) {
+          const idx = code - 97;
+          const transformed = encode ? (a * idx + b) % mod : (inv * (idx - b + mod)) % mod;
+          result += alphabet[transformed].toLowerCase();
+        } else {
+          result += ch;
+        }
+      }
+      return result;
+    }
+
+    function modInverse(a, m) {
+      for (let x = 1; x < m; x++) if ((a * x) % m === 1) return x;
+      return 1;
+    }
+
+    function railFence(text, rails, encode) {
+      if (!text) return '';
+      const rows = Array.from({ length: rails }, () => []);
+      let rail = 0;
+      let dir = 1;
+      if (encode) {
+        for (let i = 0; i < text.length; i++) {
+          rows[rail].push(text[i]);
+          if (rail === 0) dir = 1;
+          if (rail === rails - 1) dir = -1;
+          rail += dir;
+        }
+        return rows.map((r) => r.join('')).join('');
+      }
+      const pattern = [];
+      for (let i = 0; i < text.length; i++) {
+        pattern.push(rail);
+        if (rail === 0) dir = 1;
+        if (rail === rails - 1) dir = -1;
+        rail += dir;
+      }
+      const charsPerRow = pattern.reduce((acc, r) => { acc[r] = (acc[r] || 0) + 1; return acc; }, {});
+      const rowsMap = Array.from({ length: rails }, (_, i) => new Array(charsPerRow[i] || 0));
+      let idx = 0;
+      for (let r = 0; r < rails; r++) {
+        for (let c = 0; c < charsPerRow[r]; c++) {
+          rowsMap[r][c] = text[idx++];
+        }
+      }
+      let out = '';
+      let railIndex = 0;
+      let dir2 = 1;
+      for (let i = 0; i < text.length; i++) {
+        out += rowsMap[railIndex].shift();
+        if (railIndex === 0) dir2 = 1;
+        if (railIndex === rails - 1) dir2 = -1;
+        railIndex += dir2;
+      }
+      return out;
+    }
+
+    function morse(text, mode) {
+      const map = {
+        A: '.-', B: '-...', C: '-.-.', D: '-..', E: '.', F: '..-.', G: '--.', H: '....', I: '..', J: '.---',
+        K: '-.-', L: '.-..', M: '--', N: '-.', O: '---', P: '.--.', Q: '--.-', R: '.-.', S: '...', T: '-',
+        U: '..-', V: '...-', W: '.--', X: '-..-', Y: '-.--', Z: '--..', 0: '-----', 1: '.----', 2: '..---',
+        3: '...--', 4: '....-', 5: '.....', 6: '-....', 7: '--...', 8: '---..', 9: '----.', ' ': '/'
+      };
+      const reverseMap = {};
+      Object.entries(map).forEach(([k, v]) => reverseMap[v] = k);
+      const normalized = text.toUpperCase();
+      if (mode === 'enc') {
+        return normalized.split('').map((ch) => map[ch] || ch).join(' ');
+      }
+      const tokens = normalized.split(' ');
+      return tokens.map((token) => token.split('/').map((part) => part ? part.split(' ').map((p) => reverseMap[p] || p).join('') : '').join('')).join(' ');
+    }
+
+    function bacon(text, mode) {
+      const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+      const code = {
+        A: 'AAAAA', B: 'AAAAB', C: 'AAABA', D: 'AAABB', E: 'AABAA', F: 'AABAB', G: 'AABBA', H: 'AABBB', I: 'ABAAA',
+        J: 'ABAAA', K: 'ABAAB', L: 'ABABA', M: 'ABABB', N: 'ABBAA', O: 'ABBAB', P: 'ABBBA', Q: 'ABBBB', R: 'BAAAA',
+        S: 'BAAAB', T: 'BAABA', U: 'BAABB', V: 'BABAA', W: 'BABAB', X: 'BABBA', Y: 'BABBB', Z: 'BBAAA'
+      };
+      const decoded = Object.fromEntries(Object.entries(code).map(([k, v]) => [v, k]));
+      const clean = text.replace(/[^A-Za-z]/g, '').toUpperCase();
+      if (mode === 'enc') {
+        return Array.from(clean).map((ch) => code[ch] || ch).join(' ');
+      }
+      const groups = clean.match(/.{5}/g) || [];
+      return groups.map((g) => decoded[g] || '').join('');
+    }
+
+    function hashSha256() {
+      const input = $('hashInput').value;
+      crypto.subtle.digest('SHA-256', new TextEncoder().encode(input)).then((buffer) => {
+        const hex = Array.from(new Uint8Array(buffer)).map((b) => b.toString(16).padStart(2, '0')).join('');
+        out('hashOutput', hex);
+      }).catch((err) => out('hashOutput', 'SHA-256 failed: ' + err.message, true));
+    }
+
+    function generateUuid() {
+      const uuid = crypto.randomUUID ? crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+        const r = Math.random() * 16 | 0;
+        const v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
+      out('hashOutput', uuid);
+    }
+
+    function convertTimestamp() {
+      const value = $('timestampInput').value.trim();
+      if (!value) return out('timestampOutput', 'Enter a timestamp or date.', true);
+      try {
+        const numeric = Number(value);
+        const date = Number.isNaN(numeric) ? new Date(value) : new Date(numeric * 1000);
+        if (Number.isNaN(date.getTime())) throw new Error('Invalid timestamp or date.');
+        const output = `Unix timestamp: ${Math.floor(date.getTime()/1000)}\nLocal: ${date.toString()}\nISO: ${date.toISOString()}`;
+        out('timestampOutput', output);
+      } catch (err) {
+        out('timestampOutput', err.message, true);
+      }
+    }
+
+    function crc32Demo() {
+      const value = $('hashInput').value || 'DevToolbox';
+      out('timestampOutput', `CRC32: 0x${crc32(value).toString(16).padStart(8, '0').toUpperCase()}`);
+    }
+
+    function testRegex() {
+      const pattern = $('regexPattern').value;
+      const flags = $('regexFlags').value;
+      const text = $('regexText').value;
+      try {
+        const matches = [...text.matchAll(new RegExp(pattern, flags))];
+        if (!matches.length) {
+          out('regexOutput', `No matches found for /${pattern}/${flags}`);
+          return;
+        }
+        const formatted = matches.map((m, i) => `Match ${i + 1}: ${JSON.stringify(m[0])}`).join('\n');
+        out('regexOutput', `Pattern: /${pattern}/${flags}\n${formatted}`);
+      } catch (err) {
+        out('regexOutput', 'Regex error: ' + err.message, true);
+      }
+    }
+
+    function countStats() {
+      const text = $('regexText').value;
+      const words = text.trim().length ? text.trim().split(/\s+/).length : 0;
+      const lines = text.length ? text.split(/\r?\n/).length : 0;
+      out('regexOutput', `Characters: ${text.length}\nWords: ${words}\nLines: ${lines}`);
+    }
+
+    function convertNumberBase() {
+      const n = $('numberValue').value;
+      const base = Number($('numberBase').value);
+      const value = parseInt(n, base);
+      if (Number.isNaN(value)) {
+        out('numberOutput', 'Invalid number for the selected base.', true);
+        return;
+      }
+      out('numberOutput', `Decimal: ${value}\nBinary: ${value.toString(2)}\nOctal: ${value.toString(8)}\nHex: ${value.toString(16).toUpperCase()}`);
+    }
+
+    setupTheme();
+    formatJson = () => {
+      try {
+        out('jsonOutput', JSON.stringify(JSON.parse($('jsonInput').value), null, 2));
+      } catch (error) {
+        out('jsonOutput', 'Invalid JSON: ' + error.message, true);
+      }
+    };
+    minifyJson = () => {
+      try {
+        out('jsonOutput', JSON.stringify(JSON.parse($('jsonInput').value)));
+      } catch (error) {
+        out('jsonOutput', 'Invalid JSON: ' + error.message, true);
+      }
+    };
+    formatJson();
+    base64Encode = () => {
+      try {
+        out('base64Output', btoa(unescape(encodeURIComponent($('base64Input').value))));
+      } catch (error) {
+        out('base64Output', 'Encoding failed: ' + error.message, true);
+      }
+    };
+    base64Decode = () => {
+      try {
+        out('base64Output', decodeURIComponent(escape(atob($('base64Input').value))));
+      } catch (error) {
+        out('base64Output', 'Decoding failed: ' + error.message, true);
+      }
+    };
+    urlEncode = () => out('urlOutput', encodeURIComponent($('urlInput').value));
+    urlDecode = () => {
+      try {
+        out('urlOutput', decodeURIComponent($('urlInput').value));
+      } catch (error) {
+        out('urlOutput', 'URL decode failed: ' + error.message, true);
+      }
+    };
+    generateUuid();
+    convertTimestamp();
+    testRegex();
+    countStats();
+    convertNumberBase();
   </script>
 </body>
 </html>
