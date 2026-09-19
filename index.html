@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DevToolbox</title>
+    <style>
+      :root {
+        --bg: #0f172a;
+        --panel: #111827;
+        --panel-alt: #1f2937;
+        --surface: #0b1220;
+        --text: #e5e7eb;
+        --muted: #9ca3af;
+        --primary: #38bdf8;
+        --primary-strong: #0ea5e9;
+        --success: #34d399;
+        --warning: #fbbf24;
+        --danger: #f87171;
+        --border: rgba(148, 163, 184, 0.22);
+        --shadow: 0 10px 30px rgba(15, 23, 42, 0.4);
+      }
+
+      * { box-sizing: border-box; }
+
+      html, body {
+        margin: 0;
+        min-height: 100%;
+        font-family: Inter, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        background: linear-gradient(180deg, #020817 0%, var(--bg) 100%);
+        color: var(--text);
+      }
+
+      body {
+        padding: 32px 18px 56px;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      .header {
+        margin-bottom: 24px;
+      }
+
+      h1 {
+        margin: 0 0 8px;
+        font-size: clamp(2rem, 2.8vw, 3rem);
+        letter-spacing: -0.04em;
+      }
+
+      .lead {
+        margin: 0;
+        color: var(--muted);
+        font-size: 1rem;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 18px;
+      }
+
+      .card {
+        background: rgba(17, 24, 39, 0.96);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+      }
+
+      .card-header {
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--border);
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        background: rgba(148, 163, 184, 0.06);
+      }
+
+      .card-body {
+        padding: 16px;
+      }
+
+      textarea, input, select, button {
+        font: inherit;
+      }
+
+      textarea, input, select {
+        width: 100%;
+        border: 1px solid var(--border);
+        background: var(--surface);
+        color: var(--text);
+        border-radius: 10px;
+        padding: 10px 12px;
+        resize: vertical;
+      }
+
+      textarea {
+        min-height: 116px;
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 12px;
+      }
+
+      button {
+        border: none;
+        border-radius: 10px;
+        padding: 9px 12px;
+        background: var(--primary);
+        color: #03111d;
+        font-weight: 700;
+        cursor: pointer;
+        transition: filter 0.15s ease, transform 0.15s ease;
+      }
+
+      button:hover {
+        filter: brightness(1.08);
+        transform: translateY(-1px);
+      }
+
+      button.secondary {
+        background: rgba(148, 163, 184, 0.15);
+        color: var(--text);
+      }
+
+      button.success {
+        background: var(--success);
+        color: #052e1d;
+      }
+
+      .stack {
+        display: grid;
+        gap: 12px;
+      }
+
+      .row {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .label {
+        color: var(--muted);
+        font-size: 0.9rem;
+        margin-bottom: 8px;
+        display: inline-block;
+      }
+
+      .result {
+        padding: 12px;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        background: rgba(15, 23, 42, 0.8);
+        line-height: 1.5;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+      }
+
+      .result.error {
+        border-color: rgba(248, 113, 113, 0.7);
+        color: #fecaca;
+      }
+
+      .swatch {
+        display: inline-block;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        border: 2px solid rgba(255,255,255,0.2);
+        vertical-align: middle;
+        margin-left: 8px;
+      }
+
+      @media (max-width: 640px) {
+        body { padding-inline: 12px; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header class="header">
+        <h1>DevToolbox</h1>
+        <p class="lead">Tiny developer utilities in one zero-dependency page.</p>
+      </header>
+
+      <main class="grid">
+        <section class="card">
+          <div class="card-header">JSON Formatter / Minifier</div>
+          <div class="card-body stack">
+            <label class="label" for="jsonInput">JSON</label>
+            <textarea id="jsonInput" placeholder='{"hello":"world","items":[1,2,3]}'></textarea>
+            <div class="actions">
+              <button onclick="formatJson()">Format</button>
+              <button class="secondary" onclick="minifyJson()">Minify</button>
+            </div>
+            <div id="jsonOutput" class="result"></div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-header">Base64</div>
+          <div class="card-body stack">
+            <label class="label" for="base64Input">Input</label>
+            <textarea id="base64Input" placeholder="Type text to encode or decode"></textarea>
+            <div class="actions">
+              <button onclick="base64Encode()">Encode</button>
+              <button class="secondary" onclick="base64Decode()">Decode</button>
+            </div>
+            <div id="base64Output" class="result"></div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-header">URL Encoder / Decoder</div>
+          <div class="card-body stack">
+            <label class="label" for="urlInput">Text</label>
+            <textarea id="urlInput" placeholder="https://example.com/?q=hello world"></textarea>
+            <div class="actions">
+              <button onclick="urlEncode()">Encode</button>
+              <button class="secondary" onclick="urlDecode()">Decode</button>
+            </div>
+            <div id="urlOutput" class="result"></div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-header">SHA-256 Hash</div>
+          <div class="card-body stack">
+            <label class="label" for="hashInput">Text</label>
+            <textarea id="hashInput" placeholder="Enter text to hash"></textarea>
+            <div class="actions">
+              <button class="success" onclick="hashSha256()">Generate Hash</button>
+            </div>
+            <div id="hashOutput" class="result"></div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-header">UUID v4 Generator</div>
+          <div class="card-body stack">
+            <div class="actions">
+              <button onclick="generateUuid()">Generate UUID</button>
+            </div>
+            <div id="uuidOutput" class="result"></div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-header">Color Converter</div>
+          <div class="card-body stack">
+            <label class="label" for="colorInput">HEX / RGB / HSL</label>
+            <input id="colorInput" type="text" value="#38bdf8" placeholder="#38bdf8 or rgb(56, 189, 248) or hsl(199, 92%, 61%)" />
+            <div class="actions">
+              <button onclick="convertColor()">Convert</button>
+            </div>
+            <div id="colorOutput" class="result"></div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-header">Unix Timestamp Converter</div>
+          <div class="card-body stack">
+            <label class="label" for="timestampInput">Timestamp or date</label>
+            <input id="timestampInput" type="text" value="1712345678" placeholder="1712345678 or 2024-04-06T18:41:18Z" />
+            <div class="actions">
+              <button onclick="convertTimestamp()">Convert</button>
+            </div>
+            <div id="timestampOutput" class="result"></div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-header">Live Regex Tester</div>
+          <div class="card-body stack">
+            <label class="label" for="regexPattern">Pattern</label>
+            <input id="regexPattern" type="text" value="\b\w{4}\b" placeholder="e.g. \b\w{4}\b" />
+
+            <label class="label" for="regexFlags">Flags</label>
+            <input id="regexFlags" type="text" value="g" placeholder="g, i, m, s, u, y" />
+
+            <label class="label" for="regexText">Test string</label>
+            <textarea id="regexText" placeholder="Enter some text to test against the regex">alpha beta gamma delta</textarea>
+
+            <div class="actions">
+              <button onclick="testRegex()">Test</button>
+            </div>
+            <div id="regexOutput" class="result"></div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      function setResult(el, text, isError = false) {
+        el.textContent = text;
+        el.classList.toggle('error', isError);
+      }
+
+      function formatJson() {
+        const input = document.getElementById('jsonInput').value;
+        const out = document.getElementById('jsonOutput');
+        try {
+          const parsed = JSON.parse(input);
+          setResult(out, JSON.stringify(parsed, null, 2));
+        } catch (error) {
+          setResult(out, 'Invalid JSON: ' + error.message, true);
+        }
+      }
+
+      function minifyJson() {
+        const input = document.getElementById('jsonInput').value;
+        const out = document.getElementById('jsonOutput');
+        try {
+          const parsed = JSON.parse(input);
+          setResult(out, JSON.stringify(parsed));
+        } catch (error) {
+          setResult(out, 'Invalid JSON: ' + error.message, true);
+        }
+      }
+
+      function base64Encode() {
+        const input = document.getElementById('base64Input').value;
+        const out = document.getElementById('base64Output');
+        try {
+          const encoded = btoa(unescape(encodeURIComponent(input)));
+          setResult(out, encoded);
+        } catch (error) {
+          setResult(out, 'Encoding failed: ' + error.message, true);
+        }
+      }
+
+      function base64Decode() {
+        const input = document.getElementById('base64Input').value;
+        const out = document.getElementById('base64Output');
+        try {
+          const decoded = decodeURIComponent(escape(atob(input)));
+          setResult(out, decoded);
+        } catch (error) {
+          setResult(out, 'Decoding failed: ' + error.message, true);
+        }
+      }
+
+      function urlEncode() {
+        const input = document.getElementById('urlInput').value;
+        const out = document.getElementById('urlOutput');
+        setResult(out, encodeURIComponent(input));
+      }
+
+      function urlDecode() {
+        const input = document.getElementById('urlInput').value;
+        const out = document.getElementById('urlOutput');
+        try {
+          setResult(out, decodeURIComponent(input));
+        } catch (error) {
+          setResult(out, 'URL decode failed: ' + error.message, true);
+        }
+      }
+
+      async function hashSha256() {
+        const input = document.getElementById('hashInput').value;
+        const out = document.getElementById('hashOutput');
+        try {
+          const bytes = new TextEncoder().encode(input);
+          const hashBuffer = await crypto.subtle.digest('SHA-256', bytes);
+          const hashArray = Array.from(new Uint8Array(hashBuffer));
+          const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+          setResult(out, hashHex);
+        } catch (error) {
+          setResult(out, 'SHA-256 failed: ' + error.message, true);
+        }
+      }
+
+      function generateUuid() {
+        const out = document.getElementById('uuidOutput');
+        const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+          const r = Math.random() * 16 | 0;
+          const v = c === 'x' ? r : (r & 0x3 | 0x8);
+          return v.toString(16);
+        });
+        setResult(out, uuid);
+      }
+
+      function parseColor(value) {
+        const input = value.trim();
+
+        if (!input) {
+          throw new Error('Color value is empty.');
+        }
+
+        if (input.startsWith('#')) {
+          let hex = input.slice(1);
+          if (hex.length === 3) {
+            hex = hex.split('').map(ch => ch + ch).join('');
+          }
+          if (!/^[0-9a-fA-F]{6}$/.test(hex)) {
+            throw new Error('Invalid HEX color. Use #RGB or #RRGGBB.');
+          }
+
+          const r = parseInt(hex.slice(0, 2), 16);
+          const g = parseInt(hex.slice(2, 4), 16);
+          const b = parseInt(hex.slice(4, 6), 16);
+          return { r, g, b };
+        }
+
+        const rgbMatch = input.match(/^rgba?\s*\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*(?:,\s*([0-9.]+)\s*)?\)$/i);
+        if (rgbMatch) {
+          const r = Number(rgbMatch[1]);
+          const g = Number(rgbMatch[2]);
+          const b = Number(rgbMatch[3]);
+          if ([r, g, b].some(v => v < 0 || v > 255)) {
+            throw new Error('RGB values must be between 0 and 255.');
+          }
+          return { r, g, b };
+        }
+
+        const hslMatch = input.match(/^hsla?\s*\(\s*(\d{1,3})\s*,\s*(\d{1,3})%\s*,\s*(\d{1,3})%\s*(?:,\s*([0-9.]+)\s*)?\)$/i);
+        if (hslMatch) {
+          const h = Number(hslMatch[1]) % 360;
+          const s = Number(hslMatch[2]) / 100;
+          const l = Number(hslMatch[3]) / 100;
+          const c = (1 - Math.abs(2 * l - 1)) * s;
+          const x = c * (1 - Math.abs((h / 60) % 2 - 1));
+          const m = l - c / 2;
+          let r = 0, g = 0, b = 0;
+
+          if (h >= 0 && h < 60) [r, g, b] = [c, x, 0];
+          else if (h < 120) [r, g, b] = [x, c, 0];
+          else if (h < 180) [r, g, b] = [0, c, x];
+          else if (h < 240) [r, g, b] = [0, x, c];
+          else if (h < 300) [r, g, b] = [x, 0, c];
+          else [r, g, b] = [c, 0, x];
+
+          return { r: Math.round((r + m) * 255), g: Math.round((g + m) * 255), b: Math.round((b + m) * 255) };
+        }
+
+        throw new Error('Unsupported color format. Try HEX, RGB, or HSL.');
+      }
+
+      function rgbToHex(r, g, b) {
+        return '#' + [r, g, b].map(v => v.toString(16).padStart(2, '0')).join('').toUpperCase();
+      }
+
+      function rgbToHsl(r, g, b) {
+        r /= 255; g /= 255; b /= 255;
+        const max = Math.max(r, g, b);
+        const min = Math.min(r, g, b);
+        let h, s, l = (max + min) / 2;
+
+        if (max === min) {
+          h = s = 0;
+        } else {
+          const d = max - min;
+          s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+          switch (max) {
+            case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+            case g: h = (b - r) / d + 2; break;
+            default: h = (r - g) / d + 4; break;
+          }
+          h /= 6;
+        }
+
+        return {
+          h: Math.round(h * 360),
+          s: Math.round(s * 100),
+          l: Math.round(l * 100)
+        };
+      }
+
+      function convertColor() {
+        const input = document.getElementById('colorInput').value;
+        const out = document.getElementById('colorOutput');
+        try {
+          const { r, g, b } = parseColor(input);
+          const hex = rgbToHex(r, g, b);
+          const hsl = rgbToHsl(r, g, b);
+          const swatch = `<span class="swatch" style="background:${hex};"></span>`;
+          setResult(out, `HEX: ${hex}\nRGB: rgb(${r}, ${g}, ${b})\nHSL: hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)${swatch}`);
+        } catch (error) {
+          setResult(out, error.message, true);
+        }
+      }
+
+      function convertTimestamp() {
+        const input = document.getElementById('timestampInput').value.trim();
+        const out = document.getElementById('timestampOutput');
+
+        if (!input) {
+          setResult(out, 'Enter a timestamp or date.', true);
+          return;
+        }
+
+        try {
+          const numeric = Number(input);
+          let unixTs;
+          if (!Number.isNaN(numeric) && input.replace(/\s+/g, '') !== '') {
+            unixTs = numeric;
+          } else {
+            unixTs = Math.floor(new Date(input).getTime() / 1000);
+          }
+
+          if (Number.isNaN(unixTs)) {
+            throw new Error('Invalid timestamp or date.');
+          }
+
+          const date = new Date(unixTs * 1000);
+          setResult(out, `Unix timestamp: ${unixTs}\nDate: ${date.toString()}\nISO: ${date.toISOString()}`);
+        } catch (error) {
+          setResult(out, error.message, true);
+        }
+      }
+
+      function testRegex() {
+        const patternInput = document.getElementById('regexPattern').value;
+        const flagsInput = document.getElementById('regexFlags').value;
+        const text = document.getElementById('regexText').value;
+        const out = document.getElementById('regexOutput');
+
+        try {
+          const regex = new RegExp(patternInput, flagsInput);
+          const matches = [...text.matchAll(regex)];
+          if (!matches.length) {
+            setResult(out, `No matches found for /${patternInput}/${flagsInput}`);
+            return;
+          }
+
+          const formatted = matches.map((m, i) => `Match ${i + 1}: ${JSON.stringify(m[0])}${m.length > 1 ? ` Groups: ${JSON.stringify(m.slice(1))}` : ''}`).join('\n');
+          setResult(out, `Pattern: /${patternInput}/${flagsInput}\nText: ${text}\n\n${formatted}`);
+        } catch (error) {
+          setResult(out, 'Regex error: ' + error.message, true);
+        }
+      }
+
+      document.getElementById('colorInput').addEventListener('keydown', function (event) {
+        if (event.key === 'Enter') convertColor();
+      });
+
+      document.getElementById('timestampInput').addEventListener('keydown', function (event) {
+        if (event.key === 'Enter') convertTimestamp();
+      });
+
+      document.getElementById('regexPattern').addEventListener('keydown', function (event) {
+        if (event.key === 'Enter') testRegex();
+      });
+
+      document.getElementById('regexFlags').addEventListener('keydown', function (event) {
+        if (event.key === 'Enter') testRegex();
+      });
+
+      formatJson();
+      base64Encode();
+      urlEncode();
+      hashSha256();
+      generateUuid();
+      convertColor();
+      convertTimestamp();
+      testRegex();
+    </script>
+  </body>
+</html>
