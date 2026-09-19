@@ -107,6 +107,28 @@
     .stat { display: flex; justify-content: space-between; align-items: end; padding: 15px; border: 1px solid var(--border); border-radius: 14px; background: var(--panel-2); }
     .stat strong { font-size: 1.8rem; line-height: 1; }
     .stat span { color: var(--muted); }
+    .info-section {
+      margin: 30px 0 28px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+    .info-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 20px 18px;
+    }
+    .info-card h3 {
+      margin: 0 0 8px;
+      font-size: 1.1rem;
+    }
+    .info-card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.65;
+    }
     .featured { margin: 0 0 24px; }
     .section-heading { display: flex; justify-content: space-between; align-items: end; gap: 12px; margin-bottom: 12px; }
     h2 { margin: 0; font-size: 1.3rem; }
@@ -168,6 +190,7 @@
       .nav-title, .side-footer { display: none; }
       .brand { padding-bottom: 14px; }
       .hero { grid-template-columns: 1fr; }
+      .info-section { grid-template-columns: 1fr; }
     }
     @media (max-width:650px) {
       .main { padding: 16px 12px 44px; }
@@ -185,6 +208,8 @@
       <div class="nav-title">Quick navigation</div>
       <nav class="nav" aria-label="Tool navigation">
         <a class="active" href="#top">Overview</a>
+        <a href="#introduction">Introduction</a>
+        <a href="#build">Building info</a>
         <a href="#featured">Featured</a>
         <a href="#file-inspector">File inspector</a>
         <a href="#cipher-tools">Ciphers</a>
@@ -209,7 +234,7 @@
             DevToolbox is a lightweight browser toolkit for coding, debugging, and lightweight security work. It runs in a single HTML file, works offline, and keeps your data in the browser.
           </p>
           <div class="hero-actions">
-            <button class="btn primary" onclick="document.getElementById('featured').scrollIntoView({behavior:'smooth'})">Explore tools</button>
+            <button class="btn primary" onclick="document.getElementById('introduction').scrollIntoView({behavior:'smooth'})">Read introduction</button>
             <button class="btn accent" onclick="generateUuid()">Generate UUID</button>
           </div>
         </div>
@@ -218,6 +243,32 @@
           <div class="stat"><strong>0</strong><span>dependencies</span></div>
           <div class="stat"><strong>100%</strong><span>browser-based</span></div>
         </aside>
+      </section>
+
+      <section id="introduction" class="info-section">
+        <article class="info-card">
+          <h3>Introduction</h3>
+          <p>DevToolbox was created to give developers a small, dependable utility page for quick tasks without installing anything. The goal is simple: fast tools, zero build steps, and no cloud dependency for everyday work.</p>
+        </article>
+        <article class="info-card">
+          <h3>What it does</h3>
+          <p>It helps with file inspection, encoding, hashing, timestamp conversion, regex testing, text analysis, and classical cipher work. Everything runs locally in the browser and can be used as a lightweight support tool during development and troubleshooting.</p>
+        </article>
+        <article class="info-card">
+          <h3>Why use it</h3>
+          <p>Instead of opening multiple websites or installing a full package, you can use one streamlined dashboard to do common tasks faster. It is especially useful for quick validation, debugging, and learning exercises.</p>
+        </article>
+      </section>
+
+      <section id="build" class="info-section" style="grid-template-columns:repeat(2,minmax(0,1fr));">
+        <article class="info-card">
+          <h3>Building information</h3>
+          <p>DevToolbox is a static project. There are no dependencies, no bundlers, no npm install step, and no server requirement. The app is built as a single HTML file with embedded CSS and JavaScript, making it easy to run locally or publish on GitHub Pages.</p>
+        </article>
+        <article class="info-card">
+          <h3>How to run</h3>
+          <p>Open <strong>index.html</strong> directly in any modern browser, or publish the repository to GitHub Pages. For local testing, a simple double-click or browser open is enough. If you use GitHub Pages, make sure the repository settings point to the <strong>main</strong> branch and the root folder.</p>
+        </article>
       </section>
 
       <section class="featured" id="featured">
@@ -520,7 +571,7 @@
       } else if (type === 'atbash') {
         result = atbash(text);
       } else if (type === 'affine') {
-        result = affine(text, action === 'enc' ? 5 : 5, action === 'enc' ? 8 : 8, action === 'enc');
+        result = affine(text, 5, 8, action === 'enc');
       } else if (type === 'rail') {
         result = railFence(text, 3, action === 'enc');
       } else if (type === 'morse') {
@@ -653,7 +704,6 @@
     }
 
     function bacon(text, mode) {
-      const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
       const code = {
         A: 'AAAAA', B: 'AAAAB', C: 'AAABA', D: 'AAABB', E: 'AABAA', F: 'AABAB', G: 'AABBA', H: 'AABBB', I: 'ABAAA',
         J: 'ABAAA', K: 'ABAAB', L: 'ABABA', M: 'ABABB', N: 'ABBAA', O: 'ABBAB', P: 'ABBBA', Q: 'ABBBB', R: 'BAAAA',
