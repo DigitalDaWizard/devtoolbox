@@ -1,862 +1,134 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>DevToolbox</title>
-    <meta name="description" content="A tiny, zero-dependency browser toolkit for developers." />
-    <style>
-      :root {
-        --bg: #070b14;
-        --bg-2: #0f172a;
-        --panel: rgba(15, 23, 42, 0.82);
-        --panel-strong: rgba(17, 24, 39, 0.96);
-        --surface: rgba(15, 23, 42, 0.9);
-        --surface-2: rgba(30, 41, 59, 0.9);
-        --text: #e5eefb;
-        --muted: #9fb2d1;
-        --primary: #7dd3fc;
-        --primary-strong: #38bdf8;
-        --secondary: #a78bfa;
-        --success: #34d399;
-        --warning: #fbbf24;
-        --danger: #f87171;
-        --border: rgba(148, 163, 184, 0.2);
-        --shadow: 0 20px 35px rgba(2, 6, 23, 0.45);
-        --radius: 18px;
-      }
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="DevToolbox: fast, private, zero-dependency browser tools for developers.">
+  <title>DevToolbox — Developer Utilities</title>
+  <style>
+    :root { --bg:#070b14; --panel:#101827; --panel-2:#162235; --surface:#0b1220; --text:#e8f0fc; --muted:#9cafc9; --primary:#7dd3fc; --accent:#a78bfa; --good:#34d399; --danger:#fb7185; --border:rgba(148,163,184,.22); --shadow:0 18px 45px rgba(2,6,23,.42); --radius:18px; }
+    [data-theme="light"] { --bg:#eef4fb; --panel:#fff; --panel-2:#f4f7fb; --surface:#f8fafc; --text:#142033; --muted:#52647c; --primary:#0284c7; --accent:#7c3aed; --border:rgba(71,85,105,.2); --shadow:0 18px 40px rgba(51,65,85,.14); }
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body { margin:0; min-height:100vh; font:15px/1.55 Inter,system-ui,-apple-system,"Segoe UI",sans-serif; color:var(--text); background:radial-gradient(circle at 0 0,rgba(56,189,248,.18),transparent 28%),radial-gradient(circle at 100% 0,rgba(167,139,250,.16),transparent 25%),var(--bg); }
+    button,input,textarea { font:inherit; }
+    button { cursor:pointer; }
+    a { color:var(--primary); }
+    .layout { display:flex; min-height:100vh; }
+    .sidebar { position:sticky; top:0; width:260px; height:100vh; padding:22px 16px; border-right:1px solid var(--border); background:rgba(7,11,20,.72); backdrop-filter:blur(14px); z-index:5; }
+    [data-theme="light"] .sidebar { background:rgba(255,255,255,.8); }
+    .brand { display:flex; align-items:center; gap:11px; padding:4px 8px 26px; color:var(--text); text-decoration:none; font-weight:850; font-size:1.08rem; }
+    .brand img { width:42px; height:42px; object-fit:cover; border-radius:13px; box-shadow:0 8px 18px rgba(56,189,248,.22); }
+    .nav-title { padding:0 10px 8px; color:var(--muted); font-size:.72rem; text-transform:uppercase; letter-spacing:.14em; font-weight:800; }
+    .nav { display:grid; gap:4px; }
+    .nav a { padding:10px 11px; border-radius:10px; color:var(--muted); text-decoration:none; transition:.15s; }
+    .nav a:hover,.nav a.active { background:rgba(125,211,252,.12); color:var(--primary); }
+    .side-footer { position:absolute; left:24px; right:20px; bottom:22px; color:var(--muted); font-size:.8rem; }
+    .side-footer a { display:block; margin-top:5px; }
+    .main { width:min(1240px,100%); margin:0 auto; padding:25px 22px 60px; }
+    .topbar { display:flex; justify-content:flex-end; align-items:center; gap:10px; margin-bottom:22px; }
+    .icon-btn,.btn { border:1px solid var(--border); border-radius:11px; padding:9px 12px; background:var(--panel); color:var(--text); font-weight:700; transition:.15s; }
+    .icon-btn:hover,.btn:hover { transform:translateY(-1px); filter:brightness(1.08); }
+    .hero { display:grid; grid-template-columns:1.35fr .65fr; gap:20px; margin-bottom:28px; }
+    .hero-card,.stats { border:1px solid var(--border); border-radius:var(--radius); background:var(--panel); box-shadow:var(--shadow); }
+    .hero-card { padding:32px; }
+    .eyebrow { color:var(--primary); text-transform:uppercase; font-size:.74rem; letter-spacing:.16em; font-weight:850; }
+    h1 { margin:12px 0; font-size:clamp(2.35rem,5vw,4.6rem); line-height:.98; letter-spacing:-.06em; }
+    .hero p { max-width:64ch; margin:0; color:var(--muted); font-size:1.05rem; }
+    .hero-actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:24px; }
+    .btn.primary { border:0; color:#061220; background:linear-gradient(135deg,var(--primary),#38bdf8); }
+    .btn.accent { border:0; color:#fff; background:linear-gradient(135deg,var(--accent),#6366f1); }
+    .stats { display:grid; gap:12px; padding:16px; }
+    .stat { display:flex; justify-content:space-between; align-items:end; padding:15px; border:1px solid var(--border); border-radius:14px; background:var(--panel-2); }
+    .stat strong { font-size:1.8rem; line-height:1; }
+    .stat span { color:var(--muted); }
+    .featured { margin:0 0 24px; }
+    .section-heading { display:flex; justify-content:space-between; align-items:end; gap:12px; margin-bottom:12px; }
+    h2 { margin:0; font-size:1.3rem; }
+    .section-heading p { margin:0; color:var(--muted); }
+    .featured-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+    .feature { display:block; padding:17px; border:1px solid var(--border); border-radius:15px; background:linear-gradient(135deg,rgba(125,211,252,.12),rgba(167,139,250,.08)); color:var(--text); text-decoration:none; }
+    .feature:hover { border-color:var(--primary); }
+    .feature b { display:block; margin-bottom:4px; }
+    .feature span { color:var(--muted); font-size:.9rem; }
+    .tools { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:18px; }
+    .card { overflow:hidden; border:1px solid var(--border); border-radius:var(--radius); background:var(--panel); box-shadow:var(--shadow); scroll-margin-top:20px; }
+    .card-head { display:flex; justify-content:space-between; align-items:center; gap:8px; padding:14px 16px; border-bottom:1px solid var(--border); background:rgba(148,163,184,.05); font-weight:800; }
+    .tag { padding:5px 9px; border:1px solid rgba(125,211,252,.28); border-radius:999px; color:var(--primary); background:rgba(125,211,252,.1); font-size:.72rem; }
+    .card-body { display:grid; gap:11px; padding:16px; }
+    label { display:block; margin-bottom:5px; color:var(--muted); font-size:.82rem; font-weight:650; }
+    input,textarea { width:100%; padding:11px 12px; border:1px solid var(--border); border-radius:11px; color:var(--text); background:var(--surface); outline:none; resize:vertical; }
+    input:focus,textarea:focus { border-color:var(--primary); box-shadow:0 0 0 3px rgba(56,189,248,.12); }
+    textarea { min-height:105px; }
+    .actions { display:flex; flex-wrap:wrap; gap:8px; }
+    .small { padding:8px 11px; font-size:.88rem; }
+    .result-wrap { position:relative; }
+    .result { min-height:70px; padding:12px 42px 12px 13px; border:1px solid var(--border); border-radius:11px; background:var(--surface); color:var(--text); white-space:pre-wrap; overflow-wrap:anywhere; }
+    .result.error { color:#fecaca; border-color:rgba(251,113,133,.55); }
+    .copy-btn { position:absolute; top:7px; right:7px; padding:5px 7px; border:1px solid var(--border); border-radius:7px; background:var(--panel-2); color:var(--muted); font-size:.72rem; }
+    .copy-btn:hover { color:var(--primary); }
+    .swatch { display:inline-block; width:20px; height:20px; margin-left:7px; vertical-align:middle; border:2px solid rgba(255,255,255,.3); border-radius:50%; }
+    footer { margin-top:34px; padding-top:20px; border-top:1px solid var(--border); color:var(--muted); text-align:center; }
+    footer a { font-weight:700; text-decoration:none; }
+    @media (max-width:900px) { .sidebar { position:static; width:100%; height:auto; border-right:0; border-bottom:1px solid var(--border); } .layout { display:block; } .nav { display:flex; flex-wrap:wrap; } .nav-title,.side-footer { display:none; } .brand { padding-bottom:14px; } .hero { grid-template-columns:1fr; } }
+    @media (max-width:650px) { .main { padding:16px 12px 44px; } .hero-card { padding:24px 20px; } .featured-grid { grid-template-columns:1fr; } .topbar { justify-content:space-between; } }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <a class="brand" href="#top"><img src="https://i.postimg.cc/Xq8WBPS0/Picsart-26-09-19-15-25-56-276.png" alt="Digital Ghost logo"><span>DevToolbox</span></a>
+      <div class="nav-title">Quick navigation</div>
+      <nav class="nav" aria-label="Tool navigation">
+        <a class="active" href="#top">Overview</a><a href="#featured">Featured tools</a><a href="#json">JSON</a><a href="#encoding">Encoding</a><a href="#crypto">Crypto</a><a href="#text">Text tools</a><a href="#time">Time & color</a>
+      </nav>
+      <div class="side-footer">Built by <a href="https://www.digitalghost.blog" target="_blank" rel="noopener">Digital Ghost</a></div>
+    </aside>
 
-      * { box-sizing: border-box; }
-
-      html {
-        scroll-behavior: smooth;
-      }
-
-      body {
-        margin: 0;
-        min-height: 100vh;
-        font-family: Inter, "Segoe UI", Roboto, Arial, sans-serif;
-        background:
-          radial-gradient(circle at top left, rgba(56, 189, 248, 0.2), transparent 28%),
-          radial-gradient(circle at top right, rgba(167, 139, 250, 0.16), transparent 25%),
-          linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
-        color: var(--text);
-      }
-
-      a { color: inherit; }
-
-      .container {
-        max-width: 1220px;
-        margin: 0 auto;
-        padding: 28px 18px 56px;
-      }
-
-      .topbar {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 16px;
-        margin-bottom: 26px;
-        padding: 12px 16px;
-        background: rgba(15, 23, 42, 0.6);
-        border: 1px solid var(--border);
-        border-radius: 14px;
-        box-shadow: var(--shadow);
-        backdrop-filter: blur(8px);
-      }
-
-      .brand {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        font-weight: 800;
-        letter-spacing: 0.02em;
-      }
-
-      .brand-mark {
-        width: 36px;
-        height: 36px;
-        display: grid;
-        place-items: center;
-        font-size: 1.1rem;
-        border-radius: 12px;
-        background: linear-gradient(135deg, var(--primary), var(--secondary));
-        color: #101827;
-      }
-
-      .pill {
-        display: inline-flex;
-        align-items: center;
-        padding: 7px 12px;
-        border-radius: 999px;
-        background: rgba(125, 211, 252, 0.12);
-        border: 1px solid rgba(125, 211, 252, 0.25);
-        color: var(--primary);
-        font-size: 0.82rem;
-        font-weight: 700;
-      }
-
-      .hero {
-        display: grid;
-        grid-template-columns: 1.2fr 0.8fr;
-        gap: 22px;
-        align-items: stretch;
-        margin-bottom: 28px;
-      }
-
-      .hero-box, .stat-box, .card {
-        background: var(--panel);
-        border: 1px solid var(--border);
-        border-radius: var(--radius);
-        box-shadow: var(--shadow);
-      }
-
-      .hero-box {
-        padding: 28px 26px;
-      }
-
-      .eyebrow {
-        color: var(--primary);
-        font-size: 0.75rem;
-        letter-spacing: 0.15em;
-        text-transform: uppercase;
-        font-weight: 800;
-      }
-
-      h1 {
-        margin: 14px 0 12px;
-        font-size: clamp(2.3rem, 4vw, 4rem);
-        line-height: 1.04;
-        letter-spacing: -0.05em;
-      }
-
-      .subtitle {
-        margin: 0;
-        max-width: 62ch;
-        color: var(--muted);
-        font-size: 1.05rem;
-        line-height: 1.65;
-      }
-
-      .hero-actions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        margin-top: 22px;
-      }
-
-      .button {
-        appearance: none;
-        border: 0;
-        border-radius: 12px;
-        padding: 10px 14px;
-        font-weight: 700;
-        cursor: pointer;
-        transition: transform 0.15s ease, filter 0.15s ease;
-      }
-
-      .button:hover {
-        transform: translateY(-1px);
-        filter: brightness(1.08);
-      }
-
-      .button.primary {
-        background: linear-gradient(135deg, var(--primary), var(--primary-strong));
-        color: #061220;
-      }
-
-      .button.secondary {
-        background: rgba(148, 163, 184, 0.12);
-        color: var(--text);
-        border: 1px solid var(--border);
-      }
-
-      .stat-box {
-        padding: 18px 20px;
-        display: grid;
-        gap: 14px;
-      }
-
-      .stat {
-        padding: 14px 16px;
-        background: rgba(148, 163, 184, 0.05);
-        border-radius: 14px;
-        border: 1px solid var(--border);
-      }
-
-      .stat strong {
-        display: block;
-        font-size: 1.8rem;
-        margin-bottom: 6px;
-      }
-
-      .stat span {
-        color: var(--muted);
-      }
-
-      .tools-wrap {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 18px;
-      }
-
-      .card {
-        overflow: hidden;
-        background: var(--panel-strong);
-      }
-
-      .card-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 10px;
-        padding: 14px 16px;
-        border-bottom: 1px solid var(--border);
-        background: rgba(148, 163, 184, 0.05);
-        font-weight: 800;
-      }
-
-      .card-body {
-        padding: 16px;
-      }
-
-      textarea, input {
-        width: 100%;
-        border: 1px solid var(--border);
-        background: rgba(15, 23, 42, 0.75);
-        color: var(--text);
-        border-radius: 12px;
-        padding: 11px 12px;
-        resize: vertical;
-        font: inherit;
-      }
-
-      textarea {
-        min-height: 110px;
-      }
-
-      input { min-height: 44px; }
-
-      .stack {
-        display: grid;
-        gap: 12px;
-      }
-
-      .label {
-        display: inline-block;
-        color: var(--muted);
-        font-size: 0.82rem;
-        margin-bottom: 6px;
-        font-weight: 600;
-      }
-
-      .actions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        margin-top: 10px;
-      }
-
-      .button.small {
-        padding: 8px 12px;
-        font-size: 0.92rem;
-      }
-
-      .button.primary-strong {
-        background: linear-gradient(135deg, var(--primary), var(--secondary));
-        color: #091321;
-      }
-
-      .button.ghost {
-        background: rgba(148, 163, 184, 0.08);
-        color: var(--text);
-        border: 1px solid var(--border);
-      }
-
-      .button.success {
-        background: rgba(52, 211, 153, 0.16);
-        color: #bbf7d0;
-        border: 1px solid rgba(52, 211, 153, 0.28);
-      }
-
-      .result {
-        min-height: 82px;
-        padding: 12px 14px;
-        background: rgba(2, 6, 23, 0.6);
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        line-height: 1.6;
-        white-space: pre-wrap;
-        overflow-wrap: anywhere;
-        color: #dfeafc;
-      }
-
-      .result.error {
-        border-color: rgba(248, 113, 113, 0.5);
-        color: #fecaca;
-      }
-
-      .swatch {
-        display: inline-block;
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        vertical-align: middle;
-        margin-left: 8px;
-        border: 2px solid rgba(255,255,255,0.2);
-      }
-
-      @media (max-width: 820px) {
-        .hero {
-          grid-template-columns: 1fr;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <div class="container">
-      <header class="topbar">
-        <div class="brand">
-          <span class="brand-mark">D</span>
-          <span>DevToolbox</span>
-        </div>
-        <span class="pill">Zero dependency</span>
-      </header>
-
+    <main class="main" id="top">
+      <div class="topbar"><span class="tag">Private · Fast · No build step</span><button class="icon-btn" id="themeToggle" type="button" aria-label="Toggle theme">☀️ Light mode</button></div>
       <section class="hero">
-        <div class="hero-box">
-          <div class="eyebrow">Developer utilities</div>
-          <h1>Everything tiny 🚀</h1>
-          <p class="subtitle">
-            A lightweight browser toolkit for everyday engineering tasks: format JSON, hash strings,
-            convert colors, test regexes, work with timestamps, and more — all without a build step.
-          </p>
-          <div class="hero-actions">
-            <button class="button primary" onclick="document.getElementById('tools').scrollIntoView({behavior:'smooth'})">Browse tools</button>
-            <button class="button secondary" onclick="generateUuid()">Generate UUID</button>
-          </div>
-        </div>
-
-        <aside class="stat-box">
-          <div class="stat">
-            <strong>10+</strong>
-            <span>utility tools</span>
-          </div>
-          <div class="stat">
-            <strong>0</strong>
-            <span>dependencies</span>
-          </div>
-          <div class="stat">
-            <strong>1</strong>
-            <span>single HTML file</span>
-          </div>
-        </aside>
+        <div class="hero-card"><div class="eyebrow">Developer utilities</div><h1>Everything tiny.<br><span style="color:var(--primary)">Nothing extra.</span></h1><p>Useful browser tools for everyday development work. Your data stays in the browser, and the whole toolkit runs from one zero-dependency HTML file.</p><div class="hero-actions"><button class="btn primary" onclick="document.getElementById('featured').scrollIntoView({behavior:'smooth'})">Explore tools</button><button class="btn accent" onclick="generateUuid()">Generate UUID</button></div></div>
+        <aside class="stats"><div class="stat"><strong>12</strong><span>tools included</span></div><div class="stat"><strong>0</strong><span>dependencies</span></div><div class="stat"><strong>100%</strong><span>browser-based</span></div></aside>
       </section>
 
-      <main id="tools" class="tools-wrap">
-        <section class="card">
-          <div class="card-header">
-            <span>JSON Formatter</span>
-            <span class="pill">JSON</span>
-          </div>
-          <div class="card-body stack">
-            <div>
-              <label class="label" for="jsonInput">Input</label>
-              <textarea id="jsonInput" placeholder='{"hello":"world","items":[1,2,3]}'></textarea>
-            </div>
-            <div class="actions">
-              <button class="button primary small" onclick="formatJson()">Format</button>
-              <button class="button ghost small" onclick="minifyJson()">Minify</button>
-            </div>
-            <div id="jsonOutput" class="result"></div>
-          </div>
-        </section>
+      <section class="featured" id="featured"><div class="section-heading"><div><h2>Featured tools</h2><p>Jump straight to the tools you use most.</p></div></div><div class="featured-grid"><a class="feature" href="#json"><b>JSON formatter</b><span>Make structured data readable or compact.</span></a><a class="feature" href="#crypto"><b>SHA-256 hash</b><span>Create a cryptographic digest locally.</span></a><a class="feature" href="#text"><b>Live regex tester</b><span>Test patterns and inspect capture groups.</span></a></div></section>
 
-        <section class="card">
-          <div class="card-header">
-            <span>Base64</span>
-            <span class="pill">Encode / Decode</span>
-          </div>
-          <div class="card-body stack">
-            <div>
-              <label class="label" for="base64Input">Input</label>
-              <textarea id="base64Input" placeholder="Type text to encode or decode"></textarea>
-            </div>
-            <div class="actions">
-              <button class="button primary small" onclick="base64Encode()">Encode</button>
-              <button class="button ghost small" onclick="base64Decode()">Decode</button>
-            </div>
-            <div id="base64Output" class="result"></div>
-          </div>
-        </section>
-
-        <section class="card">
-          <div class="card-header">
-            <span>URL Encoder</span>
-            <span class="pill">URL</span>
-          </div>
-          <div class="card-body stack">
-            <div>
-              <label class="label" for="urlInput">Text</label>
-              <textarea id="urlInput" placeholder="https://example.com/?q=hello world"></textarea>
-            </div>
-            <div class="actions">
-              <button class="button primary small" onclick="urlEncode()">Encode</button>
-              <button class="button ghost small" onclick="urlDecode()">Decode</button>
-            </div>
-            <div id="urlOutput" class="result"></div>
-          </div>
-        </section>
-
-        <section class="card">
-          <div class="card-header">
-            <span>SHA-256 Hash</span>
-            <span class="pill">Crypto</span>
-          </div>
-          <div class="card-body stack">
-            <div>
-              <label class="label" for="hashInput">Text</label>
-              <textarea id="hashInput" placeholder="Enter text to hash"></textarea>
-            </div>
-            <div class="actions">
-              <button class="button success small" onclick="hashSha256()">Generate</button>
-            </div>
-            <div id="hashOutput" class="result"></div>
-          </div>
-        </section>
-
-        <section class="card">
-          <div class="card-header">
-            <span>UUID v4</span>
-            <span class="pill">ID</span>
-          </div>
-          <div class="card-body stack">
-            <div class="actions">
-              <button class="button primary-strong small" onclick="generateUuid()">Generate UUID</button>
-            </div>
-            <div id="uuidOutput" class="result"></div>
-          </div>
-        </section>
-
-        <section class="card">
-          <div class="card-header">
-            <span>Color Converter</span>
-            <span class="pill">HEX / RGB / HSL</span>
-          </div>
-          <div class="card-body stack">
-            <div>
-              <label class="label" for="colorInput">Color</label>
-              <input id="colorInput" type="text" value="#38bdf8" placeholder="#38bdf8 or rgb(56, 189, 248) or hsl(199, 92%, 61%)" />
-            </div>
-            <div class="actions">
-              <button class="button primary small" onclick="convertColor()">Convert</button>
-            </div>
-            <div id="colorOutput" class="result"></div>
-          </div>
-        </section>
-
-        <section class="card">
-          <div class="card-header">
-            <span>Timestamp</span>
-            <span class="pill">Time</span>
-          </div>
-          <div class="card-body stack">
-            <div>
-              <label class="label" for="timestampInput">Timestamp or date</label>
-              <input id="timestampInput" type="text" value="1712345678" placeholder="1712345678 or 2024-04-06T18:41:18Z" />
-            </div>
-            <div class="actions">
-              <button class="button primary small" onclick="convertTimestamp()">Convert</button>
-            </div>
-            <div id="timestampOutput" class="result"></div>
-          </div>
-        </section>
-
-        <section class="card">
-          <div class="card-header">
-            <span>Regex Tester</span>
-            <span class="pill">Pattern match</span>
-          </div>
-          <div class="card-body stack">
-            <div>
-              <label class="label" for="regexPattern">Pattern</label>
-              <input id="regexPattern" type="text" value="\\b\\w{4}\\b" placeholder="e.g. \\b\\w{4}\\b" />
-            </div>
-            <div>
-              <label class="label" for="regexFlags">Flags</label>
-              <input id="regexFlags" type="text" value="g" placeholder="g, i, m, s, u, y" />
-            </div>
-            <div>
-              <label class="label" for="regexText">Test string</label>
-              <textarea id="regexText" placeholder="Enter some text to test against the regex">alpha beta gamma delta</textarea>
-            </div>
-            <div class="actions">
-              <button class="button primary small" onclick="testRegex()">Test</button>
-            </div>
-            <div id="regexOutput" class="result"></div>
-          </div>
-        </section>
-
-        <section class="card">
-          <div class="card-header">
-            <span>Case Converter</span>
-            <span class="pill">Text</span>
-          </div>
-          <div class="card-body stack">
-            <div>
-              <label class="label" for="caseInput">Text</label>
-              <textarea id="caseInput" placeholder="Convert text to uppercase, lowercase, title case, sentence case"></textarea>
-            </div>
-            <div class="actions">
-              <button class="button primary small" onclick="upperCase()">UPPER</button>
-              <button class="button ghost small" onclick="lowerCase()">lower</button>
-              <button class="button ghost small" onclick="titleCase()">Title</button>
-              <button class="button ghost small" onclick="sentenceCase()">Sentence</button>
-            </div>
-            <div id="caseOutput" class="result"></div>
-          </div>
-        </section>
-
-        <section class="card">
-          <div class="card-header">
-            <span>Text Stats</span>
-            <span class="pill">Metrics</span>
-          </div>
-          <div class="card-body stack">
-            <div>
-              <label class="label" for="statsInput">Text</label>
-              <textarea id="statsInput" placeholder="Paste text to calculate character, word, and line counts"></textarea>
-            </div>
-            <div class="actions">
-              <button class="button primary small" onclick="countTextStats()">Analyze</button>
-            </div>
-            <div id="statsOutput" class="result"></div>
-          </div>
-        </section>
+      <main class="tools">
+        <section class="card" id="json"><div class="card-head"><span>JSON Formatter / Minifier</span><span class="tag">JSON</span></div><div class="card-body"><div><label for="jsonInput">Input</label><textarea id="jsonInput" placeholder='{"hello":"world","items":[1,2,3]}'></textarea></div><div class="actions"><button class="btn primary small" onclick="formatJson()">Format</button><button class="btn small" onclick="minifyJson()">Minify</button></div><div class="result-wrap"><div id="jsonOutput" class="result"></div><button class="copy-btn" onclick="copyResult('jsonOutput',this)">Copy</button></div></div></section>
+        <section class="card" id="encoding"><div class="card-head"><span>Base64</span><span class="tag">Encode</span></div><div class="card-body"><div><label for="base64Input">Input</label><textarea id="base64Input" placeholder="Type text to encode or decode"></textarea></div><div class="actions"><button class="btn primary small" onclick="base64Encode()">Encode</button><button class="btn small" onclick="base64Decode()">Decode</button></div><div class="result-wrap"><div id="base64Output" class="result"></div><button class="copy-btn" onclick="copyResult('base64Output',this)">Copy</button></div></div></section>
+        <section class="card"><div class="card-head"><span>URL Encoder / Decoder</span><span class="tag">URL</span></div><div class="card-body"><div><label for="urlInput">Input</label><textarea id="urlInput" placeholder="https://example.com/?q=hello world"></textarea></div><div class="actions"><button class="btn primary small" onclick="urlEncode()">Encode</button><button class="btn small" onclick="urlDecode()">Decode</button></div><div class="result-wrap"><div id="urlOutput" class="result"></div><button class="copy-btn" onclick="copyResult('urlOutput',this)">Copy</button></div></div></section>
+        <section class="card" id="crypto"><div class="card-head"><span>SHA-256 Hash</span><span class="tag">Crypto</span></div><div class="card-body"><div><label for="hashInput">Text</label><textarea id="hashInput" placeholder="Enter text to hash"></textarea></div><div class="actions"><button class="btn primary small" onclick="hashSha256()">Generate hash</button></div><div class="result-wrap"><div id="hashOutput" class="result"></div><button class="copy-btn" onclick="copyResult('hashOutput',this)">Copy</button></div></div></section>
+        <section class="card"><div class="card-head"><span>UUID v4 Generator</span><span class="tag">ID</span></div><div class="card-body"><div class="actions"><button class="btn accent small" onclick="generateUuid()">Generate UUID</button></div><div class="result-wrap"><div id="uuidOutput" class="result"></div><button class="copy-btn" onclick="copyResult('uuidOutput',this)">Copy</button></div></div></section>
+        <section class="card" id="time"><div class="card-head"><span>Color Converter</span><span class="tag">HEX · RGB · HSL</span></div><div class="card-body"><div><label for="colorInput">Color</label><input id="colorInput" value="#38bdf8" placeholder="#38bdf8 or rgb(56, 189, 248)"></div><div class="actions"><button class="btn primary small" onclick="convertColor()">Convert</button></div><div class="result-wrap"><div id="colorOutput" class="result"></div><button class="copy-btn" onclick="copyResult('colorOutput',this)">Copy</button></div></div></section>
+        <section class="card"><div class="card-head"><span>Unix Timestamp</span><span class="tag">Time</span></div><div class="card-body"><div><label for="timestampInput">Timestamp or date</label><input id="timestampInput" value="1712345678" placeholder="1712345678 or 2024-04-06T18:41:18Z"></div><div class="actions"><button class="btn primary small" onclick="convertTimestamp()">Convert</button></div><div class="result-wrap"><div id="timestampOutput" class="result"></div><button class="copy-btn" onclick="copyResult('timestampOutput',this)">Copy</button></div></div></section>
+        <section class="card" id="text"><div class="card-head"><span>Live Regex Tester</span><span class="tag">Pattern</span></div><div class="card-body"><div><label for="regexPattern">Pattern</label><input id="regexPattern" value="\\b\\w{4}\\b"></div><div><label for="regexFlags">Flags</label><input id="regexFlags" value="g"></div><div><label for="regexText">Test string</label><textarea id="regexText">alpha beta gamma delta</textarea></div><div class="actions"><button class="btn primary small" onclick="testRegex()">Test regex</button></div><div class="result-wrap"><div id="regexOutput" class="result"></div><button class="copy-btn" onclick="copyResult('regexOutput',this)">Copy</button></div></div></section>
+        <section class="card"><div class="card-head"><span>Case Converter</span><span class="tag">Text</span></div><div class="card-body"><div><label for="caseInput">Text</label><textarea id="caseInput" placeholder="Type text to convert"></textarea></div><div class="actions"><button class="btn primary small" onclick="caseConvert('upper')">UPPER</button><button class="btn small" onclick="caseConvert('lower')">lower</button><button class="btn small" onclick="caseConvert('title')">Title</button><button class="btn small" onclick="caseConvert('sentence')">Sentence</button></div><div class="result-wrap"><div id="caseOutput" class="result"></div><button class="copy-btn" onclick="copyResult('caseOutput',this)">Copy</button></div></div></section>
+        <section class="card"><div class="card-head"><span>Text Statistics</span><span class="tag">Metrics</span></div><div class="card-body"><div><label for="statsInput">Text</label><textarea id="statsInput" placeholder="Paste text to analyze"></textarea></div><div class="actions"><button class="btn primary small" onclick="countStats()">Analyze</button></div><div class="result-wrap"><div id="statsOutput" class="result"></div><button class="copy-btn" onclick="copyResult('statsOutput',this)">Copy</button></div></div></section>
       </main>
-    </div>
-
-    <script>
-      function setResult(el, text, isError = false) {
-        el.textContent = text;
-        el.classList.toggle('error', isError);
-      }
-
-      function copyText(text) {
-        if (!navigator.clipboard) return false;
-        navigator.clipboard.writeText(text).catch(() => {});
-        return true;
-      }
-
-      function formatJson() {
-        const input = document.getElementById('jsonInput').value;
-        const out = document.getElementById('jsonOutput');
-        try {
-          const parsed = JSON.parse(input);
-          const result = JSON.stringify(parsed, null, 2);
-          setResult(out, result);
-          copyText(result);
-        } catch (error) {
-          setResult(out, 'Invalid JSON: ' + error.message, true);
-        }
-      }
-
-      function minifyJson() {
-        const input = document.getElementById('jsonInput').value;
-        const out = document.getElementById('jsonOutput');
-        try {
-          const parsed = JSON.parse(input);
-          const result = JSON.stringify(parsed);
-          setResult(out, result);
-          copyText(result);
-        } catch (error) {
-          setResult(out, 'Invalid JSON: ' + error.message, true);
-        }
-      }
-
-      function base64Encode() {
-        const input = document.getElementById('base64Input').value;
-        const out = document.getElementById('base64Output');
-        try {
-          const encoded = btoa(unescape(encodeURIComponent(input)));
-          setResult(out, encoded);
-          copyText(encoded);
-        } catch (error) {
-          setResult(out, 'Encoding failed: ' + error.message, true);
-        }
-      }
-
-      function base64Decode() {
-        const input = document.getElementById('base64Input').value;
-        const out = document.getElementById('base64Output');
-        try {
-          const decoded = decodeURIComponent(escape(atob(input)));
-          setResult(out, decoded);
-          copyText(decoded);
-        } catch (error) {
-          setResult(out, 'Decoding failed: ' + error.message, true);
-        }
-      }
-
-      function urlEncode() {
-        const input = document.getElementById('urlInput').value;
-        const out = document.getElementById('urlOutput');
-        const result = encodeURIComponent(input);
-        setResult(out, result);
-        copyText(result);
-      }
-
-      function urlDecode() {
-        const input = document.getElementById('urlInput').value;
-        const out = document.getElementById('urlOutput');
-        try {
-          const result = decodeURIComponent(input);
-          setResult(out, result);
-          copyText(result);
-        } catch (error) {
-          setResult(out, 'URL decode failed: ' + error.message, true);
-        }
-      }
-
-      async function hashSha256() {
-        const input = document.getElementById('hashInput').value;
-        const out = document.getElementById('hashOutput');
-        try {
-          const bytes = new TextEncoder().encode(input);
-          const hashBuffer = await crypto.subtle.digest('SHA-256', bytes);
-          const hashArray = Array.from(new Uint8Array(hashBuffer));
-          const hashHex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
-          setResult(out, hashHex);
-          copyText(hashHex);
-        } catch (error) {
-          setResult(out, 'SHA-256 failed: ' + error.message, true);
-        }
-      }
-
-      function generateUuid() {
-        const out = document.getElementById('uuidOutput');
-        const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-          const r = (Math.random() * 16) | 0;
-          const v = c === 'x' ? r : (r & 0x3) | 0x8;
-          return v.toString(16);
-        });
-        setResult(out, uuid);
-        copyText(uuid);
-      }
-
-      function parseColor(value) {
-        const input = value.trim();
-        if (!input) throw new Error('Color value is empty.');
-
-        if (input.startsWith('#')) {
-          let hex = input.slice(1);
-          if (hex.length === 3) hex = hex.split('').map((ch) => ch + ch).join('');
-          if (!/^[0-9a-fA-F]{6}$/.test(hex)) throw new Error('Invalid HEX color. Use #RGB or #RRGGBB.');
-          return {
-            r: parseInt(hex.slice(0, 2), 16),
-            g: parseInt(hex.slice(2, 4), 16),
-            b: parseInt(hex.slice(4, 6), 16)
-          };
-        }
-
-        const rgbMatch = input.match(/^rgba?\s*\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*(?:,\s*([0-9.]+)\s*)?\)$/i);
-        if (rgbMatch) {
-          const r = Number(rgbMatch[1]);
-          const g = Number(rgbMatch[2]);
-          const b = Number(rgbMatch[3]);
-          if ([r, g, b].some((v) => v < 0 || v > 255)) throw new Error('RGB values must be between 0 and 255.');
-          return { r, g, b };
-        }
-
-        const hslMatch = input.match(/^hsla?\s*\(\s*(\d{1,3})\s*,\s*(\d{1,3})%\s*,\s*(\d{1,3})%\s*(?:,\s*([0-9.]+)\s*)?\)$/i);
-        if (hslMatch) {
-          const h = Number(hslMatch[1]) % 360;
-          const s = Number(hslMatch[2]) / 100;
-          const l = Number(hslMatch[3]) / 100;
-          const c = (1 - Math.abs(2 * l - 1)) * s;
-          const x = c * (1 - Math.abs((h / 60) % 2 - 1));
-          const m = l - c / 2;
-          let r = 0, g = 0, b = 0;
-
-          if (h >= 0 && h < 60) [r, g, b] = [c, x, 0];
-          else if (h < 120) [r, g, b] = [x, c, 0];
-          else if (h < 180) [r, g, b] = [0, c, x];
-          else if (h < 240) [r, g, b] = [0, x, c];
-          else if (h < 300) [r, g, b] = [x, 0, c];
-          else [r, g, b] = [c, 0, x];
-
-          return {
-            r: Math.round((r + m) * 255),
-            g: Math.round((g + m) * 255),
-            b: Math.round((b + m) * 255)
-          };
-        }
-
-        throw new Error('Unsupported color format. Try HEX, RGB, or HSL.');
-      }
-
-      function rgbToHex(r, g, b) {
-        return '#' + [r, g, b].map((v) => v.toString(16).padStart(2, '0')).join('').toUpperCase();
-      }
-
-      function rgbToHsl(r, g, b) {
-        r /= 255; g /= 255; b /= 255;
-        const max = Math.max(r, g, b);
-        const min = Math.min(r, g, b);
-        let h, s, l = (max + min) / 2;
-
-        if (max === min) {
-          h = s = 0;
-        } else {
-          const d = max - min;
-          s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-          switch (max) {
-            case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-            case g: h = (b - r) / d + 2; break;
-            default: h = (r - g) / d + 4; break;
-          }
-          h /= 6;
-        }
-
-        return {
-          h: Math.round(h * 360),
-          s: Math.round(s * 100),
-          l: Math.round(l * 100)
-        };
-      }
-
-      function convertColor() {
-        const input = document.getElementById('colorInput').value;
-        const out = document.getElementById('colorOutput');
-        try {
-          const { r, g, b } = parseColor(input);
-          const hex = rgbToHex(r, g, b);
-          const hsl = rgbToHsl(r, g, b);
-          const swatch = `<span class="swatch" style="background:${hex};"></span>`;
-          const result = `HEX: ${hex}\nRGB: rgb(${r}, ${g}, ${b})\nHSL: hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)${swatch}`;
-          setResult(out, result);
-          copyText(result.replace(/\n/g, ' | '));
-        } catch (error) {
-          setResult(out, error.message, true);
-        }
-      }
-
-      function convertTimestamp() {
-        const input = document.getElementById('timestampInput').value.trim();
-        const out = document.getElementById('timestampOutput');
-
-        if (!input) {
-          setResult(out, 'Enter a timestamp or date.', true);
-          return;
-        }
-
-        try {
-          const numeric = Number(input);
-          let unixTs;
-          if (!Number.isNaN(numeric) && input.replace(/\s+/g, '') !== '') {
-            unixTs = numeric;
-          } else {
-            unixTs = Math.floor(new Date(input).getTime() / 1000);
-          }
-
-          if (Number.isNaN(unixTs)) throw new Error('Invalid timestamp or date.');
-
-          const date = new Date(unixTs * 1000);
-          const result = `Unix timestamp: ${unixTs}\nDate: ${date.toString()}\nISO: ${date.toISOString()}`;
-          setResult(out, result);
-          copyText(result.replace(/\n/g, ' | '));
-        } catch (error) {
-          setResult(out, error.message, true);
-        }
-      }
-
-      function testRegex() {
-        const patternInput = document.getElementById('regexPattern').value;
-        const flagsInput = document.getElementById('regexFlags').value;
-        const text = document.getElementById('regexText').value;
-        const out = document.getElementById('regexOutput');
-
-        try {
-          const regex = new RegExp(patternInput, flagsInput);
-          const matches = [...text.matchAll(regex)];
-          if (!matches.length) {
-            setResult(out, `No matches found for /${patternInput}/${flagsInput}`);
-            return;
-          }
-
-          const formatted = matches
-            .map((m, i) => `Match ${i + 1}: ${JSON.stringify(m[0])}${m.length > 1 ? ` Groups: ${JSON.stringify(m.slice(1))}` : ''}`)
-            .join('\n');
-          const result = `Pattern: /${patternInput}/${flagsInput}\nText: ${text}\n\n${formatted}`;
-          setResult(out, result);
-          copyText(result);
-        } catch (error) {
-          setResult(out, 'Regex error: ' + error.message, true);
-        }
-      }
-
-      function upperCase() {
-        const value = document.getElementById('caseInput').value;
-        const output = value.toUpperCase();
-        document.getElementById('caseOutput').textContent = output;
-        copyText(output);
-      }
-
-      function lowerCase() {
-        const value = document.getElementById('caseInput').value;
-        const output = value.toLowerCase();
-        document.getElementById('caseOutput').textContent = output;
-        copyText(output);
-      }
-
-      function titleCase() {
-        const value = document.getElementById('caseInput').value;
-        const output = value.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
-        document.getElementById('caseOutput').textContent = output;
-        copyText(output);
-      }
-
-      function sentenceCase() {
-        const value = document.getElementById('caseInput').value;
-        const output = value.toLowerCase().replace(/(^\s*\w|[.!?]\s+\w)/g, (char) => char.toUpperCase());
-        document.getElementById('caseOutput').textContent = output;
-        copyText(output);
-      }
-
-      function countTextStats() {
-        const value = document.getElementById('statsInput').value;
-        const words = value.trim() ? value.trim().split(/\s+/).length : 0;
-        const chars = value.length;
-        const lines = value === '' ? 0 : value.split(/\r?\n/).length;
-        const output = `Characters: ${chars}\nWords: ${words}\nLines: ${lines}`;
-        document.getElementById('statsOutput').textContent = output;
-      }
-
-      function addKeypressHandlers() {
-        ['jsonInput', 'base64Input', 'urlInput', 'hashInput', 'colorInput', 'timestampInput', 'regexPattern', 'regexFlags', 'regexText', 'caseInput', 'statsInput']
-          .forEach((id) => {
-            const el = document.getElementById(id);
-            if (!el) return;
-            el.addEventListener('keydown', (event) => {
-              if (event.key === 'Enter' && (id === 'colorInput' || id === 'timestampInput' || id === 'regexPattern' || id === 'regexFlags')) {
-                if (id === 'colorInput') convertColor();
-                if (id === 'timestampInput') convertTimestamp();
-                if (id === 'regexPattern' || id === 'regexFlags') testRegex();
-              }
-            });
-          });
-      }
-
-      addKeypressHandlers();
-      formatJson();
-      base64Encode();
-      urlEncode();
-      hashSha256();
-      generateUuid();
-      convertColor();
-      convertTimestamp();
-      testRegex();
-      countTextStats();
-    </script>
-  </body>
+      <footer>DevToolbox is made with care by <a href="https://www.digitalghost.blog" target="_blank" rel="noopener">Digital Ghost</a> · MIT License</footer>
+    </main>
+  </div>
+  <script>
+    const $ = id => document.getElementById(id);
+    function output(id,text,error=false){ $(id).textContent=text; $(id).classList.toggle('error',error); }
+    function copyResult(id,button){ navigator.clipboard?.writeText($(id).textContent).then(()=>{ const old=button.textContent; button.textContent='Copied!'; setTimeout(()=>button.textContent=old,1000); }); }
+    function formatJson(){try{const r=JSON.stringify(JSON.parse($('jsonInput').value),null,2);output('jsonOutput',r);}catch(e){output('jsonOutput','Invalid JSON: '+e.message,true);}}
+    function minifyJson(){try{output('jsonOutput',JSON.stringify(JSON.parse($('jsonInput').value)));}catch(e){output('jsonOutput','Invalid JSON: '+e.message,true);}}
+    function base64Encode(){try{output('base64Output',btoa(unescape(encodeURIComponent($('base64Input').value))));}catch(e){output('base64Output','Encoding failed: '+e.message,true);}}
+    function base64Decode(){try{output('base64Output',decodeURIComponent(escape(atob($('base64Input').value))));}catch(e){output('base64Output','Decoding failed: '+e.message,true);}}
+    function urlEncode(){output('urlOutput',encodeURIComponent($('urlInput').value));}
+    function urlDecode(){try{output('urlOutput',decodeURIComponent($('urlInput').value));}catch(e){output('urlOutput','URL decode failed: '+e.message,true);}}
+    async function hashSha256(){try{const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode($('hashInput').value));output('hashOutput',Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join(''));}catch(e){output('hashOutput','SHA-256 failed: '+e.message,true);}}
+    function generateUuid(){const r=crypto.randomUUID?crypto.randomUUID():'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const n=Math.random()*16|0;return(c==='x'?n:n&3|8).toString(16);});output('uuidOutput',r);}
+    function parseColor(v){v=v.trim();if(v[0]==='#'){let h=v.slice(1);if(h.length===3)h=h.split('').map(x=>x+x).join('');if(!/^[\da-f]{6}$/i.test(h))throw Error('Use #RGB or #RRGGBB');return{r:parseInt(h.slice(0,2),16),g:parseInt(h.slice(2,4),16),b:parseInt(h.slice(4),16)};}let m=v.match(/^rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)$/i);if(m)return{r:+m[1],g:+m[2],b:+m[3]};throw Error('Use HEX or rgb(r, g, b)');}
+    function convertColor(){try{const{r,g,b}=parseColor($('colorInput').value),h='#'+[r,g,b].map(x=>x.toString(16).padStart(2,'0')).join('').toUpperCase(),mx=Math.max(r,g,b)/255,mn=Math.min(r,g,b)/255,l=(mx+mn)/2;output('colorOutput',`HEX: ${h}\nRGB: rgb(${r}, ${g}, ${b})\nLightness: ${Math.round(l*100)}%`);}catch(e){output('colorOutput',e.message,true);}}
+    function convertTimestamp(){try{const v=$('timestampInput').value.trim(),n=Number(v),t=Number.isNaN(n)?new Date(v):new Date(n*1000);if(Number.isNaN(t.getTime()))throw Error('Invalid timestamp or date');output('timestampOutput',`Unix timestamp: ${Math.floor(t.getTime()/1000)}\nLocal: ${t}\nISO: ${t.toISOString()}`);}catch(e){output('timestampOutput',e.message,true);}}
+    function testRegex(){try{const p=$('regexPattern').value,f=$('regexFlags').value,text=$('regexText').value,m=[...text.matchAll(new RegExp(p,f))];output('regexOutput',m.length?m.map((x,i)=>`Match ${i+1}: ${JSON.stringify(x[0])}`).join('\n'):`No matches found for /${p}/${f}`);}catch(e){output('regexOutput','Regex error: '+e.message,true);}}
+    function caseConvert(mode){let v=$('caseInput').value,r=v;if(mode==='upper')r=v.toUpperCase();if(mode==='lower')r=v.toLowerCase();if(mode==='title')r=v.toLowerCase().replace(/\b\w/g,x=>x.toUpperCase());if(mode==='sentence')r=v.toLowerCase().replace(/(^\s*\w|[.!?]\s+\w)/g,x=>x.toUpperCase());output('caseOutput',r);}
+    function countStats(){const v=$('statsInput').value;output('statsOutput',`Characters: ${v.length}\nWords: ${v.trim()?v.trim().split(/\s+/).length:0}\nLines: ${v?v.split(/\r?\n/).length:0}`);}
+    $('themeToggle').onclick=()=>{const light=document.documentElement.dataset.theme==='light';document.documentElement.dataset.theme=light?'dark':'light';$('themeToggle').textContent=light?'☀️ Light mode':'🌙 Dark mode';};
+    formatJson();base64Encode();urlEncode();hashSha256();generateUuid();convertColor();convertTimestamp();testRegex();countStats();
+  </script>
+</body>
 </html>
